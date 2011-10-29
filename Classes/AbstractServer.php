@@ -77,7 +77,7 @@ abstract class EasyDeploy_AbstractServer {
 	 * @return string
 	 */
 	public function getCurrentUsername() {
-		return $this->run('whoami',FALSE,TRUE);
+		return trim( $this->run('whoami',FALSE,TRUE) );
 	}
 	
 	/**
