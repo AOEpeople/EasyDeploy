@@ -12,7 +12,6 @@ Example Usage
 -------------
 
 The easiest usage is to use the *Server Classes to execute commands. The command execution allows to wait for user inputs - just the way like you are used to in a typical shell.
-
 ::
 	$server = new EasyDeploy_RemoteServer('www.aoemedia.de');
 	echo "Now listing the content of my home directory:';
@@ -61,7 +60,6 @@ On the remote Server the package is downloaded via scp from "yourbuildserver.de"
 
 
 Lets make it a bit nicer:
-
 ::
 	$buildNr = EasyDeploy_Utils::userInput('Enter Build Nr that you want to deploy: ');
 	$packageSource = 'ssh://user@yourbuildserver.de:/builds/'.$buildNr.'/aoemedia.tar.gz';
