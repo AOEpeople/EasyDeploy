@@ -1,5 +1,11 @@
 <?php
+require_once(dirname(__FILE__).'/UnknownSourceFormatException.php');
 
+/**
+ * Common Deploy Service that can be used to deploy.
+ * It first downloads the package and then installs the package using a given Install Strategie
+ * @author Daniell Pötzinger
+ */
 class EasyDeploy_DeployService {
 	/**
 	 * 
@@ -32,8 +38,13 @@ class EasyDeploy_DeployService {
 	 */
 	private $installStrategie;
 	
-	public function __construct() {
-		$this->setInstallStrategie(new EasyDeploy_InstallStrategie_PHPInstaller());
+	public function __construct(EasyDeploy_InstallStrategie_Interface $installStrategie = NULL) {
+		if (is_null($installStrategie)) {
+			$this->setInstallStrategie(new EasyDeploy_InstallStrategie_PHPInstaller());
+		}
+		else {
+			$this->setInstallStrategie($installStrategie);
+		}
 	}
 
 	/**
@@ -97,7 +108,7 @@ class EasyDeploy_DeployService {
 			$server->copy($from,$to);
 		}
 		else {
-			throw new Exception($from.' File not existend or it is a unknown source deglaration!');
+			throw new EasyDeploy_UnknownSourceFormatException($from.' File not existend or it is a unknown source deglaration!');
 		}
 		
 	

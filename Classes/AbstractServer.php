@@ -35,19 +35,6 @@ abstract class EasyDeploy_AbstractServer {
 	abstract public function isFile($dir);
 	
 	/**
-	 * Downloads a file from http with wget
-	 * @param unknown_type $from
-	 * @param unknown_type $to
-	 */
-	public function wgetDownload($from,$to,$user=null,$password=null) {
-		$options= '';
-		if (isset($user) && $user != '') {
-			$options = ' --http-user='.$user.' --http-password='.$password;
-		}
-		return $this->run('cd '.$to.'; wget '.$options. ' '.$from);
-	}
-	
-	/**
 	 * @param string $command
 	 * @return array out, error, returncode
 	 */
@@ -86,5 +73,26 @@ abstract class EasyDeploy_AbstractServer {
 		return $result;
 	}
 	
+	/**
+	 * @return string
+	 */
+	public function getCurrentUsername() {
+		return $this->run('whoami',FALSE,TRUE);
+	}
+	
+	/**
+	 * Downloads a file from http with wget
+	 * @param string $from  the url that should be downloaded
+	 * @param string $to  download target
+	 * @param $user optional the http-auth user name
+	 * @param $password optional the http-auth password
+	 */
+	public function wgetDownload($from,$to,$user=null,$password=null) {
+		$options= '';
+		if (isset($user) && $user != '') {
+			$options = ' --http-user='.$user.' --http-password='.$password;
+		}
+		return $this->run('cd '.$to.'; wget '.$options. ' '.$from);
+	}
 	
 }

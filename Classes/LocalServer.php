@@ -46,6 +46,7 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 	public function isDir($dir) {
 		return is_dir($dir);
 	}
+	
 	/**
 	 * @param string $dir
 	 * @return boolean
