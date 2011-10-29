@@ -17,9 +17,8 @@ The easiest usage is to use the *Server Classes to execute commands. The command
 	echo "Now listing the content of my home directory:';
 	server->run('ls -al');
 
-
- In order to be able to run commands on a remoteserver you need to configure our ssh account to be able to login to the remoteserver via ssh without password:
- (simply create your very own security key and paste the public file into a file called “.ssh/authorized_keys” in the home directory for the server’s deployment user. 
+In order to be able to run commands on a remoteserver you need to configure our ssh account to be able to login to the remoteserver via ssh without password:
+(simply create your very own security key and paste the public file into a file called “.ssh/authorized_keys” in the home directory for the server’s deployment user. 
  See also:
  - http://kimmo.suominen.com/docs/ssh/
  - http://the.earth.li/~sgtatham/putty/0.60/htmldoc/Chapter8.html#pubkey
