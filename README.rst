@@ -37,42 +37,43 @@ But anything else is possible too.
 So a simple script could look like this:
 ::
 	<?php
-	
-	require_once(dirname(__FILE__).'EasyDeploy/Classes/Utils.php');
+	require_once dirname(__FILE__) . '/EasyDeploy/Classes/Utils.php';
 	EasyDeploy_Utils::includeAll();
-	
-	$server = new EasyDeploy_RemoteServer('www.aoemedia.de');
-	
+
+	$projectName = 'proalpha';
+	$releaseDirectory = 'ssh://your.name@your.server:/path/releases/%s';
+	$deliveryDirectory = '/path/delivery';
+	$backupDirectory = '/path/backup';
+	$systemRootDirectory = '/var/www/project';
+	$server = new EasyDeploy_LocalServer();
+
+	$releaseVersion = EasyDeploy_Utils::userInput('Enter release no you want to install: ');
+	$environment = EasyDeploy_Utils::userInput('Enter environment to install (staging|production): ');
+	$createBackup = EasyDeploy_Utils::userInput('Create backup before installing the release: ');
+
 	$deployer = new EasyDeploy_DeployService();
-	$deployer->setEnvironmentName('production');
-	$deployer->setSystemPath('/var/www/aoemedia/production/');
-	$deployer->setDeliveryFolder('/deliveries');
+	$deployer->setProjectName($projectName);
+	$deployer->setCreateBackupBeforeInstalling($createBackup);
+	$deployer->setDeliveryFolder($deliveryDirectory);
 	$deployer->setDeployerUnixGroup('www-data');
-	
-	//now deploy the package 
-	$packageSource = 'ssh://user@yourbuildserver.de:/builds/6/aoemedia.tar.gz';
-	$releaseName= 'build6';
-	$deployer->deploy($server, releaseName, $packageSource);
+	$deployer->setSystemPath($systemRootDirectory);
+	$deployer->setBackupstorageroot($backupDirectory);
+
+	try {
+		$deployer->setEnvironmentName($environment);
+		$deployer->deploy($server, $releaseVersion, sprintf($releaseDirectory, $releaseVersion));
+	} catch (EasyDeploy_CommandFailedException $e) {
+		print EasyDeploy_Utils::formatMessage(rtrim($e->getMessage()), EasyDeploy_Utils::MESSAGE_TYPE_ERROR) . PHP_EOL;
+		print EasyDeploy_Utils::formatMessage('Exiting deployment for release: "' . $releaseVersion . '"', EasyDeploy_Utils::MESSAGE_TYPE_ERROR) . PHP_EOL . PHP_EOL;
+	}
 
 This will install the package on a remote server. 
 On the remote Server the package is downloaded via rsync from "yourbuildserver.de" to a deliverfolder and then the package is untared and the installation is started.
 
-
-Lets make it a bit nicer:
-::
-	$buildNr = EasyDeploy_Utils::userInput('Enter Build Nr that you want to deploy: ');
-	$packageSource = 'ssh://user@yourbuildserver.de:/builds/'.$buildNr.'/aoemedia.tar.gz';
-
-
-If you dont want to deploy to a remoteserver but you are already logged in to the liveserver just replace the Server class:
-::
-	$server = new EasyDeploy_LocalServer();
-
-
 Supported Packagepaths
 ------------------------------
 
-In the example above the installationpackage was available on a buildserver. There are other possibilities:
+In the example above the $releaseDirectory was available on a build server. There are other possibilities:
 
 a) Local file:
   Example Package Path: /home/user/mypackage.tar.gz
