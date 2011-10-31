@@ -42,6 +42,7 @@ class EasyDeploy_Utils {
 	static public function includeAllForRollback() {
 		require_once(dirname(__FILE__) . '/RemoteServer.php');
 		require_once(dirname(__FILE__) . '/LocalServer.php');
+		require_once(dirname(__FILE__) . '/Environment.php');
 		require_once(dirname(__FILE__) . '/RollbackService.php');
 	}
 

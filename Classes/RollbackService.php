@@ -40,6 +40,11 @@ class EasyDeploy_RollbackService {
 	private $systemPath;
 
 	/**
+	 * @var EasyDeploy_AbstractServer
+	 */
+	protected $server;
+
+	/**
 	 * @param string $environment
 	 * @return void
 	 */
@@ -63,19 +68,18 @@ class EasyDeploy_RollbackService {
 	/**
 	 * Switch active with inactive environment.
 	 *
-	 * @param EasyDeploy_AbstractServer $server
+	 * @param \EasyDeploy_AbstractServer $server
 	 * @return void
 	 */
 	public function process(EasyDeploy_AbstractServer $server) {
-
-		if ($server->isLink($this->systemPath)) {
-			
-		}
-
+		$environmentService = new EasyDeploy_Environment($server, $this->environment, $this->systemPath);
+		$tmpLinkName = $this->environment . '_tmp';
+		$target = $environmentService->getInactiveEnvironment();
+		
 		$command =<<<EOD
 cd $this->systemPath \
-&& ln -s {TARGET_PORTAL} {SYSTEM_INSTANCE_NAME}_tmp
-&& mv -Tf {SYSTEM_INSTANCE_NAME}_tmp {SYSTEM_INSTANCE_NAME}
+&& ln -s $target $tmpLinkName  \
+&& mv -Tf $tmpLinkName $this->environment
 EOD;
 
 		$server->run($command);
