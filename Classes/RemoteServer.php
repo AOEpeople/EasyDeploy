@@ -121,4 +121,20 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	public function setUserName($userName) {
 		$this->userName = $userName;
 	}
+
+	/**
+	 * @param string $directory
+	 * @return boolean
+	 */
+	public function isLink($directory) {
+		$isLink = false;
+
+		try {
+			$this->run('if [ -L "' . $directory . '" ] ; then exit 0; else exit 1; done');
+			$isLink = true;
+		} catch (EasyDeploy_CommandFailedException $e) {
+		}
+
+		return $isLink;
+	}
 }
