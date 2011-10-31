@@ -7,11 +7,26 @@ require_once(dirname(__FILE__).'/UnknownSourceFormatException.php');
  * @author Daniell Pötzinger
  */
 class EasyDeploy_DeployService {
+
+	/**
+	 * @var array
+	 */
+	private $allowedEnvironments = array(
+		'staging',
+		'production'
+	);
+
+	/**
+	 * @var string
+	 */
+	private $createBackupBeforeInstalling = '1';
+
 	/**
 	 * 
 	 * @var $deliveryFolder string
 	 */
 	private $deliveryFolder;
+	
 	/**
 	 * Environmentname for the installation (e.g. "production") This might be required by the install process to adjust environment specifc settings
 	 * @var unknown_type
@@ -34,16 +49,24 @@ class EasyDeploy_DeployService {
 	private $deployerUnixGroup;
 	
 	/**
-	 * @var EasyDeploy_InstallStrategie_Interface
+	 * @var EasyDeploy_InstallStrategy_Interface
 	 */
-	private $installStrategie;
-	
-	public function __construct(EasyDeploy_InstallStrategie_Interface $installStrategie = NULL) {
-		if (is_null($installStrategie)) {
-			$this->setInstallStrategie(new EasyDeploy_InstallStrategie_PHPInstaller());
-		}
-		else {
-			$this->setInstallStrategie($installStrategie);
+	private $installStrategy;
+
+	/**
+	 * @var string
+	 */
+	private $projectName;
+
+	/**
+	 * @param EasyDeploy_InstallStrategy_Interface|null $installStrategy
+	 * @return EasyDeploy_DeployService
+	 */
+	public function __construct(EasyDeploy_InstallStrategy_Interface $installStrategy = NULL) {
+		if (is_null($installStrategy)) {
+			$this->setInstallStrategy(new EasyDeploy_InstallStrategy_PHPInstaller());
+		} else {
+			$this->setInstallStrategy($installStrategy);
 		}
 	}
 
@@ -58,10 +81,11 @@ class EasyDeploy_DeployService {
 		if (!$server->isDir($this->deliveryFolder)) {
 			throw new Exception($this->deliveryFolder.' deliveryFolder not existend on server!');
 		}
-		$downloadedFile = $this->download($server, $packageSourcePath, $this->deliveryFolder.'/'.$releaseName);
-		$this->installPackage($server, $downloadedFile);
+
+		$downloadedReleaseDirectory = $this->download($server, $packageSourcePath, $this->deliveryFolder . '/' . $releaseName);
+		$this->installPackage($server, $downloadedReleaseDirectory);
 	}
-	
+
 	/**
 	 * Downloads the specified file (from) to the local directoy (to)
 	 * $from can be a local file or a remote file (http:// and ssh:// supported)
@@ -101,7 +125,7 @@ class EasyDeploy_DeployService {
 			//ssh://user@server:path
 			$parsedUrlParts=parse_url($from);
 			$path = substr($from,strrpos($from,':')+1);
-			$command= 'scp '.$parsedUrlParts['user'].'@'.$parsedUrlParts['host'].':'.$path.' '.$to;
+			$command= 'rsync -avz '.$parsedUrlParts['user'].'@'.$parsedUrlParts['host'].':'.$path.' '.$to;
 			$server->run($command, TRUE);
 		}
 		else if (is_file($from)) {
@@ -114,37 +138,46 @@ class EasyDeploy_DeployService {
 	
 		//fix permissions of downloaded package
 		if (isset($this->deployerUnixGroup)) {
-			$server->run('chgrp '.$this->deployerUnixGroup.' '.$to.$baseName);
+			$server->run('chgrp '.$this->deployerUnixGroup.' '. $to);
 		}
 		return $to.$baseName;
 	}
-	
+
 	/**
 	 * Deploys to the given server
-	 * @param EasyDeploy_RemoteServer $server
+	 * @param \EasyDeploy_AbstractServer|\EasyDeploy_RemoteServer $server
+	 * @param $packagePath
+	 *
 	 */
 	public function installPackage(EasyDeploy_AbstractServer $server, $packagePath) {		
 		if (!isset($this->systemPath) || $this->systemPath == '') {
-                        throw new Exception('SystemPath not set');
+			throw new Exception('SystemPath not set');
         }
         
 		if (!isset($this->environmentName) || $this->environmentName == '') {
-                        throw new Exception('environment name not set');
+			throw new Exception('Environment name not set');
         }
+		$this->pathToLocalConf = sprintf($this->pathToLocalConf, $this->systemPath . '/' . $this->environmentName);
+		if (is_file($this->pathToLocalConf)) {
+			$server->run('echo "" >> ' . sprintf($this->pathToLocalConf, $this->systemPath . '/' . $this->environmentName));
+		}
 
-		//get package and copy to deliveryfolder
-		$packageBaseName=pathinfo($packagePath,PATHINFO_BASENAME);
-		$packageFileName=substr($packageBaseName,0,strpos($packageBaseName,'.'));
-		$packageDeliveryFolder = pathinfo($packagePath,PATHINFO_DIRNAME);
-		
-		//unzip package
-		$server->run('cd '.$packageDeliveryFolder.'; tar -xzf '.$packageDeliveryFolder.'/'.$packageBaseName);
-		
-		$this->installStrategie->installSteps($packageDeliveryFolder, $packageFileName, $this, $server);
+		// get package and copy to deliveryfolder
+		$packageBaseName = pathinfo($packagePath, PATHINFO_BASENAME);
+		$packageFileName = substr($packageBaseName, 0, strpos($packageBaseName, '.'));
+		$packageDeliveryFolder = pathinfo($packagePath, PATHINFO_DIRNAME);
+		$releaseVersion = basename($packageDeliveryFolder);
+
+		// unzip package
+		$releasePackageName = $server->run('find ' . $packageDeliveryFolder . ' -type f -name "' . $this->projectName . '-' . $releaseVersion . '*.tar.gz" | sort | tail -n 1', FALSE, TRUE);
+		$server->run('cd ' . $packageDeliveryFolder . '; tar -xzf ' . $releasePackageName);
+
+		$this->installStrategy->installSteps($packageDeliveryFolder, $this->projectName, $this, $server);
 			
-		//delete unzipped folder
-		$server->run('rm -rf '.$packageDeliveryFolder.'/'.$packageFileName);
+		// delete unzipped folder
+		$server->run('rm -rf ' . $packageDeliveryFolder . '/' . $this->projectName);
 	}
+
 	/**
 	 * @return the $deliveryFolder
 	 */
@@ -173,8 +206,6 @@ class EasyDeploy_DeployService {
 		return $this->backupstorageroot;
 	}
 
-	
-
 	/**
 	 * @param $deliveryFolder the $deliveryFolder to set
 	 */
@@ -186,6 +217,9 @@ class EasyDeploy_DeployService {
 	 * @param $environmentName the $environmentName to set
 	 */
 	public function setEnvironmentName($environmentName) {
+		if (!in_array($environmentName, $this->allowedEnvironments)) {
+			throw new UnexpectedValueException('Environment must be: ' . PHP_EOL . '- ' . implode(PHP_EOL . '- ', $this->allowedEnvironments) . PHP_EOL . PHP_EOL);
+		}
 		$this->environmentName = $environmentName;
 	}
 
@@ -217,21 +251,55 @@ class EasyDeploy_DeployService {
 		$this->deployerUnixGroup = $deployerUnixGroup;
 	}
 	/**
-	 * @return EasyDeploy_InstallStrategie_Interface
+	 * @return EasyDeploy_InstallStrategy_Interface
 	 */
-	public function getInstallStrategie() {
-		return $this->installStrategie;
+	public function getInstallStrategy() {
+		return $this->installStrategy;
 	}
 
 	/**
-	 * @param $installStrategie the $installStrategie to set
+	 * @param \EasyDeploy_InstallStrategy_Interface|\the $installStrategy $installStrategy to set
+	 *
 	 */
-	public function setInstallStrategie(EasyDeploy_InstallStrategie_Interface $installStrategie) {
-		$this->installStrategie = $installStrategie;
+	public function setInstallStrategy(EasyDeploy_InstallStrategy_Interface $installStrategy) {
+		$this->installStrategy = $installStrategy;
 	}
 
-	
+	/**
+	 * Default is set to "1"
+	 *
+	 * @param string $createBackup
+	 * @return void
+	 */
+	public function setCreateBackupBeforeInstalling($createBackup) {
+		$createBackup = strtolower($createBackup);
+		if ($createBackup === 'n' || $createBackup === 'no' || $createBackup === '0') {
+			$this->createBackupBeforeInstalling = '0';
+		}
+	}
 
+	/**
+	 * Indicate that a fresh backup of master system should be done
+	 * before the installation starts.
+	 *
+	 * @return string
+	 */
+	public function getCreateBackupBeforeInstalling() {
+		return $this->createBackupBeforeInstalling;
+	}
 
+	/**
+	 * @param string $projectName
+	 * @return void
+	 */
+	public function setProjectName($projectName) {
+		$this->projectName = $projectName;
+	}
 
+	/**
+	 * @return void
+	 */
+	public function getProjectName() {
+		return $this->projectName;
+	}
 }

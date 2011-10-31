@@ -4,13 +4,13 @@ require_once(dirname(__FILE__).'/AbstractServer.php');
 
 /**
  * Represents a local server 
- * 
- * 
+ *
  * @author Daniel Pötzinger
  */
 class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
+
 	
-	
+
 	/**
 	 * Runs the given command remotely
 	 * @throws EasyDeploy_CommandFailedException
@@ -21,7 +21,7 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 	public function run($command, $withInteraction = FALSE, $returnOutput = FALSE) {
 		
 		$shellCommand = $command;
-		echo ' ['.$shellCommand.']'.PHP_EOL;	
+		print EasyDeploy_Utils::formatMessage('[' . rtrim($shellCommand) . ']', EasyDeploy_Utils::MESSAGE_TYPE_INFO) . PHP_EOL;
 		$result = $this->executeCommand( $shellCommand, $returnOutput );
 		if ($result['returncode'] != 0 ) {
 			throw new EasyDeploy_CommandFailedException($result['error']);
@@ -38,7 +38,15 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 	public function copyLocalFile($from,$to) {
 		$this->executeCommand( 'cp '.escapeshellarg($from).' '.escapeshellarg($to) );
 	}
-	
+
+	/**
+	 * @param string $path
+	 * @return bool
+	 */
+	public function isLink($path) {
+		return is_link(rtrim($path, '/'));
+	}
+
 	/**
 	 * @param string $dir
 	 * @return boolean

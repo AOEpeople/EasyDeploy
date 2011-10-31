@@ -55,7 +55,7 @@ So a simple script could look like this:
 	$deployer->deploy($server, releaseName, $packageSource);
 
 This will install the package on a remote server. 
-On the remote Server the package is downloaded via scp from "yourbuildserver.de" to a deliverfolder and then the package is untared and the installation is started.
+On the remote Server the package is downloaded via rsync from "yourbuildserver.de" to a deliverfolder and then the package is untared and the installation is started.
 
 
 Lets make it a bit nicer:

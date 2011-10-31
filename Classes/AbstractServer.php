@@ -27,7 +27,14 @@ abstract class EasyDeploy_AbstractServer {
 	 * @return boolean
 	 */
 	abstract public function isDir($dir);
-	
+
+	/**
+	 * @abstract
+	 * @param string $directory
+	 * @return boolean
+	 */
+	abstract public function isLink($directory);
+
 	/**
 	 * @param string $dir
 	 * @return boolean

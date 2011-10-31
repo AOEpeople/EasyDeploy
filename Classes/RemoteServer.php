@@ -13,13 +13,26 @@ require_once(dirname(__FILE__).'/AbstractServer.php');
  * @author Daniel Pötzinger 
  */
 class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
-	private $host;
-	
+
 	/**
-	 * @param string $host
+	 * @var string
 	 */
-	public function __construct($host) {
+	private $host;
+
+	/**
+	 * @var string
+	 */
+	private $userName;
+
+	/**
+	 *
+	 * @param string $host
+	 * @param string $userName
+	 * @return \EasyDeploy_RemoteServer
+	 */
+	public function __construct($host, $userName = '') {
 		$this->host = $host;
+		$this->userName = $userName;
 	}
 	
 	/**
@@ -36,7 +49,8 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		else {
 			$shellCommand = 'ssh';
 		}
-		$shellCommand .= ' ' . $this->host.' '.escapeshellarg($command);
+		$shellCommand .= ' ' . ((!is_null($this->userName)) ? $this->userName . '@' : '') . $this->host.' '.escapeshellarg($command);
+
 		echo ' ['.$shellCommand.']'.PHP_EOL;	
 		$result = $this->executeCommand( $shellCommand, $returnOutput );
 		if ($result['returncode'] != 0 ) {
@@ -57,7 +71,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		if (!is_file($from)) {
 			throw new Exception($from.' is not a file');
 		}
-		$this->executeCommand( 'scp '.escapeshellarg($from).' '.$this->host.':'.escapeshellarg($to) );
+		$this->executeCommand( 'rsync -avz '.escapeshellarg($from).' '.$this->host.':'.escapeshellarg($to) );
 	}
 	
 	/**
@@ -97,8 +111,14 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		}
 		return false;
 	}
-	
-	
 
-	
+	/**
+	 * SSH user name.
+	 *
+	 * @param string $userName
+	 * @return void
+	 */
+	public function setUserName($userName) {
+		$this->userName = $userName;
+	}
 }
