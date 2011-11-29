@@ -16,7 +16,7 @@ class DeployServiceTest extends PHPUnit_Framework_TestCase {
 		$localServerMock = $this->getMock('EasyDeploy_LocalServer');
 		$installStrategyMock = $this->getMock('EasyDeploy_InstallStrategy_Interface',array('installSteps'));
 		$deployService = new EasyDeploy_DeployService($installStrategyMock);
-		$localServerMock = $this->getMock('EasyDeploy_AbstractServer',array('isDir','wgetDownload','run'));
+		$localServerMock = $this->getMock('EasyDeploy_AbstractServer',array('isDir','wgetDownload','run','isFile'));
 		$localServerMock->expects($this->any())->method('isDir')->will($this->returnValue(TRUE));
 		$localServerMock->expects($this->once())->method('wgetDownload')->will($this->returnValue(TRUE));
 		$installStrategyMock->expects($this->once())->method('installSteps')->will($this->returnValue(TRUE));	
@@ -33,7 +33,7 @@ class DeployServiceTest extends PHPUnit_Framework_TestCase {
 		$localServerMock = $this->getMock('EasyDeploy_LocalServer');
 		$installStrategyMock = $this->getMock('EasyDeploy_InstallStrategy_Interface');
 		$deployService = new EasyDeploy_DeployService($installStrategyMock);
-		$localServerMock = $this->getMock('EasyDeploy_AbstractServer',array('isDir'));
+		$localServerMock = $this->getMock('EasyDeploy_AbstractServer',array('isDir','isFile'));
 		$localServerMock->expects($this->any())->method('isDir')->will($this->returnValue(TRUE));
 		$deployService->deploy($localServerMock,'test','@unknown source');
 	}

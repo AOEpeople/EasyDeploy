@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/EasyDeploy/Classes/Utils.php';
-EasyDeploy_Utils::includeAllForRollback();
+EasyDeploy_Utils::includeAll();
 /**
  * Directory containing the following structure:
  * <example>
@@ -8,13 +8,15 @@ EasyDeploy_Utils::includeAllForRollback();
  * production -> production-a
  * production-a
  * production-b
+ * 
  * staging -> staging-a
  * staging-a
  * staging-b
+ * 
  * </example>
  */
 $systemRootDirectory = '/path/to/www';
-$environment = EasyDeploy_Utils::userInput('Enter environment to rollback (staging|production): ');
+$environment = 	EasyDeploy_Utils::userSelectionInput('Select the Environment that you want to roll back:',array('staging','production'));
 
 $rollbackService = new EasyDeploy_RollbackService();
 $rollbackService->setEnvironment($environment);

@@ -1,7 +1,19 @@
 <?php
+/**
+ * Copyright notice
+ *
+ * (c) 2011 AOE media GmbH <dev@aoemedia.de>
+ * All rights reserved
+ *
+ *
+ * This copyright notice MUST APPEAR in all copies of the script!
+ */
 
-require_once(dirname(__FILE__).'/CommandFailedException.php');
+require_once(dirname(__FILE__).'/Exception/CommandFailedException.php');
 
+/**
+ * Basic Server Class representing a Servernode
+ */
 abstract class EasyDeploy_AbstractServer {
 	
 	
@@ -101,7 +113,7 @@ abstract class EasyDeploy_AbstractServer {
 		}
 		$result = $this->run('cd '.$to.'; wget '.$options. ' '.$from, FALSE, TRUE);
 		if (strpos($result,'Invalid')) {
-			throw new EasyDeploy_CommandFailedException('Error while downloading with wget: "'.$result.'"');
+			throw new EasyDeploy_Exception_CommandFailedException('Error while downloading with wget: "'.$result.'"');
 		}
 	}
 	

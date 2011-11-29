@@ -60,7 +60,7 @@ class EasyDeploy_Environment {
 		$systemPath = rtrim($systemPath, '/') . '/';
 
 		if (!$this->server->isLink($systemPath . $environment) || !$this->server->isDir($systemPath . $environment)) {
-			throw new UnexpectedValueException();
+			throw new UnexpectedValueException('The path '.$systemPath . $environment.' is not a link - cannot roll back');
 		}
 
 		$this->setEnvironment($environment);
@@ -122,7 +122,6 @@ class EasyDeploy_Environment {
 
 		$activeInstanceSuffix = substr($this->activeEnvironment, -2);
 
-			// TODO add support for generic instances like a,b,c,d ..
 		foreach ($this->environmentSuffix as $instance) {
 			if ($instance != $activeInstanceSuffix) {
 				$this->inactiveEnvironment = $this->environment . $instance;

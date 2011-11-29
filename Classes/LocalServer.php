@@ -1,4 +1,13 @@
 <?php
+/**
+ * Copyright notice
+ *
+ * (c) 2011 AOE media GmbH <dev@aoemedia.de>
+ * All rights reserved
+ *
+ *
+ * This copyright notice MUST APPEAR in all copies of the script!
+ */
 
 require_once(dirname(__FILE__).'/AbstractServer.php');
 
@@ -24,7 +33,7 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 		print EasyDeploy_Utils::formatMessage('[' . rtrim($shellCommand) . ']', EasyDeploy_Utils::MESSAGE_TYPE_INFO) . PHP_EOL;
 		$result = $this->executeCommand( $shellCommand, $returnOutput );
 		if ($result['returncode'] != 0 ) {
-			throw new EasyDeploy_CommandFailedException($result['error']);
+			throw new EasyDeploy_Exception_CommandFailedException($result['error']);
 		}
 		if ($returnOutput) {
 			return $result['out'];

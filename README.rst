@@ -34,6 +34,23 @@ Imagine you want to deploy your latest project to a RemoteServer.
 Following the concept of a Deployment-Pipeline your deployment or build process should already build an installationpackage that can be used to install the project.
 But anything else is possible too.
 
+So a simple Script, that only uses the server object to execute shell commands could look like this:
+::
+	<?php
+	require_once dirname(__FILE__) . '/EasyDeploy/Classes/Utils.php';
+	EasyDeploy_Utils::includeAll();
+	$server = new EasyDeploy_RemoteServer('www.myproject.com');
+	$server->wgetDownload('http://buildserver/job/build/latest/mypackage.tar.gz','/etc/apps/delivery');
+	$server->run('tar -xzf /etc/apps/delivery/mypackage.tar.gz');
+	$server->run('cp -R /etc/apps/delivery/mypackage /system/path');
+	
+	
+Of course this won't be a typical deployment script - but gives some idea.
+EasyDeploy has another class "DeployService". The purpose of this class is to trigger a deploymentprocess follwoing this convention:
+# A Package is downloaded from a given path (see below for the supported syntax) to a given deliver folder on the server. Therefore a subfolder with the given releasename is created in the delivery folder. 
+# The package is unpacked
+# An InstallationStrategy is triggered to Install this package. This InstallStrategy can read all the relevant properties from the DeployService - like the name of the environment, targetpath for the installation...
+
 So a simple script could look like this:
 ::
 	<?php
@@ -45,14 +62,15 @@ So a simple script could look like this:
 	$packagePath = 'ssh://your.name@yourbuildserver.de:/path/releases/latest/myproject.tar.gz';
 	// local path on server where the package should be downloaded to before it is installed:
 	$deliveryDirectory = '/path/delivery';
-	
-	//more properties the instalation sxript wants to know:
-	$projectName = 'myproject';
-	$backupDirectory = '/path/backup';
-	$environment='production';
-	$releaseVersion='release1';
 	//target path for the installation (where should it install to)
 	$systemPath = '/var/www/project/production';
+	
+	//more properties the instalations strategie might want to know:
+	$projectName = 'myproject';
+	$backupDirectory = '/path/backup';
+	$environmentName='production';
+	$releaseVersion='release1';
+	
 
 	$server = new EasyDeploy_RemoteServer('www.myproject.com');
 	$deployer = new EasyDeploy_DeployService();
@@ -61,7 +79,7 @@ So a simple script could look like this:
 	$deployer->setDeployerUnixGroup('www-data');
 	$deployer->setSystemPath($systemPath);
 	$deployer->setBackupstorageroot($backupDirectory);
-	$deployer->setEnvironmentName($environment);
+	$deployer->setEnvironmentName($environmentName);
 	try {		
 		$deployer->deploy($server, $releaseVersion, $packagePath);
 	} catch (EasyDeploy_CommandFailedException $e) {
@@ -92,7 +110,7 @@ User Input
 If you need user input to get some values you need, you can use the Utils Class like this:
 ::
 	EasyDeploy_Utils::userInput('Your input');
-	EasyDeploy_Utils::userInput('Select between',array('option1','option2'));
+	EasyDeploy_Utils::userSelectionInput('Select between',array('option1','option2'));
 
 You can also get Parameters that are passed to the Installscript (like deploy.php --parameter=value )
 ::

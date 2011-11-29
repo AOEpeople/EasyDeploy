@@ -57,21 +57,22 @@ class EasyDeploy_Utils {
 		}				
 		return $options[$result];				
 	}
-
-	static public function includeAllForRollback() {
-		require_once(dirname(__FILE__) . '/RemoteServer.php');
-		require_once(dirname(__FILE__) . '/LocalServer.php');
-		require_once(dirname(__FILE__) . '/Environment.php');
-		require_once(dirname(__FILE__) . '/RollbackService.php');
-	}
-
+	
+	/**
+	 * Includes all relevant Classes and initialises date timezone
+	 * @return void
+	 */
 	static public function includeAll() {
 		require_once(dirname(__FILE__) . '/RemoteServer.php');
 		require_once(dirname(__FILE__) . '/LocalServer.php');
 		require_once(dirname(__FILE__) . '/DeployService.php');
+		
 		require_once(dirname(__FILE__) . '/InstallStrategy/Interface.php');
 		require_once(dirname(__FILE__) . '/InstallStrategy/PHPInstaller.php');
 		require_once(dirname(__FILE__) . '/InstallStrategy/WebProjectPHPInstaller.php');
+		
+		require_once(dirname(__FILE__) . '/Rollback/Environment.php');
+		require_once(dirname(__FILE__) . '/Rollback/RollbackService.php');
 
 		self::printWelcomeScreen();
 

@@ -11,21 +11,13 @@
 
 
 /**
- *
+ * Rollback Service that rolls back by switching symlink
  * 
  * @author: Michael Klapper <michael.klapper@aoemedia.de>
  * @date: 28.10.11
  * @time: 15:41
  */
 class EasyDeploy_RollbackService {
-
-	/**
-	 * @var array
-	 */
-	private $allowedEnvironments = array(
-		'staging',
-		'production'
-	);
 
 	/**
 	 * Environment can be "staging" or "production"
@@ -49,9 +41,6 @@ class EasyDeploy_RollbackService {
 	 * @return void
 	 */
 	public function setEnvironment($environment) {
-		if (!in_array($environment, $this->allowedEnvironments)) {
-			throw new UnexpectedValueException('Environment must be: ' . PHP_EOL . '- ' . implode(PHP_EOL . '- ', $this->allowedEnvironments) . PHP_EOL . PHP_EOL);
-		}
 		$this->environment = $environment;
 	}
 

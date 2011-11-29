@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/UnknownSourceFormatException.php');
+require_once(dirname(__FILE__).'/Exception/UnknownSourceFormatException.php');
 
 /**
  * Common Deploy Service that can be used to deploy.
@@ -7,14 +7,6 @@ require_once(dirname(__FILE__).'/UnknownSourceFormatException.php');
  * @author Daniell Pötzinger
  */
 class EasyDeploy_DeployService {
-
-	/**
-	 * @var array
-	 */
-	private $allowedEnvironments = array(
-		'staging',
-		'production'
-	);
 
 	/**
 	 * @var boolean
@@ -132,7 +124,7 @@ class EasyDeploy_DeployService {
 			$server->copy($from,$to);
 		}
 		else {
-			throw new EasyDeploy_UnknownSourceFormatException($from.' File not existend or it is a unknown source deglaration!');
+			throw new EasyDeploy_Exception_UnknownSourceFormatException($from.' File not existend or it is a unknown source deglaration!');
 		}
 		
 	
@@ -221,9 +213,6 @@ class EasyDeploy_DeployService {
 	 * @param $environmentName the $environmentName to set
 	 */
 	public function setEnvironmentName($environmentName) {
-		if (!in_array($environmentName, $this->allowedEnvironments)) {
-			throw new UnexpectedValueException('Environment must be: ' . PHP_EOL . '- ' . implode(PHP_EOL . '- ', $this->allowedEnvironments) . PHP_EOL . PHP_EOL);
-		}
 		$this->environmentName = $environmentName;
 	}
 
@@ -303,4 +292,6 @@ class EasyDeploy_DeployService {
 	public function getProjectName() {
 		return $this->projectName;
 	}
+
+
 }

@@ -1,4 +1,14 @@
 <?php
+/**
+ * Copyright notice
+ *
+ * (c) 2011 AOE media GmbH <dev@aoemedia.de>
+ * All rights reserved
+ *
+ *
+ * This copyright notice MUST APPEAR in all copies of the script!
+ */
+
 require_once(dirname(__FILE__).'/AbstractServer.php');
 
 /**
@@ -54,7 +64,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		echo ' ['.$shellCommand.']'.PHP_EOL;	
 		$result = $this->executeCommand( $shellCommand, $returnOutput );
 		if ($result['returncode'] != 0 ) {
-			throw new EasyDeploy_CommandFailedException($result['error']);
+			throw new EasyDeploy_Exception_CommandFailedException($result['error']);
 		}
 		if ($returnOutput) {
 			return $result['out'];
@@ -82,7 +92,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		try {
 			$output = $this->run('ls -al '.$dir, FALSE, TRUE);
 		}
-		catch(EasyDeploy_CommandFailedException $e) {
+		catch(EasyDeploy_Exception_CommandFailedException $e) {
 			if (strpos( $e->getMessage(),'No such file or directory') !== FALSE) {
 				return false;
 			}
@@ -132,7 +142,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		try {
 			$this->run('if [ -L "' . $directory . '" ] ; then exit 0; else exit 1; done');
 			$isLink = true;
-		} catch (EasyDeploy_CommandFailedException $e) {
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
 		}
 
 		return $isLink;
