@@ -46,12 +46,12 @@ So a simple Script, that only uses the server object to execute shell commands c
 	
 	
 Of course this won't be a typical deployment script - but gives some idea.
-EasyDeploy has another class "DeployService". The purpose of this class is to trigger a deploymentprocess follwoing this convention:
-# A Package is downloaded from a given path (see below for the supported syntax) to a given deliver folder on the server. Therefore a subfolder with the given releasename is created in the delivery folder. 
-# The package is unpacked
-# An InstallationStrategy is triggered to Install this package. This InstallStrategy can read all the relevant properties from the DeployService - like the name of the environment, targetpath for the installation...
+EasyDeploy has another class "DeployService". The purpose of this class is to trigger a deploymentprocess following this steps:
+* A Package is downloaded from a given path (see below for the supported syntax) to a given deliver folder on the server. Therefore a subfolder with the given releasename is created in the delivery folder. 
+* The package is unpacked
+* An InstallationStrategy is triggered to Install this package. This InstallStrategy can read all the relevant properties from the DeployService - like the name of the environment, targetpath for the installation...
 
-So a simple script could look like this:
+So a deployment script could look like this:
 ::
 	<?php
 	require_once dirname(__FILE__) . '/EasyDeploy/Classes/Utils.php';
@@ -101,8 +101,12 @@ a) Local file:
 b) Web:
   Example Package Path: http://user:password@host.de/path/mypackage.tar.gz
   
-c) SSH (SCP)
+c) SSH (RSYNC is used to copy)
   Example Package Path: ssh://user@host.de:/path/mypackage.tar.gz
+  
+d) SSH to a folder 
+  Example Package Path: ssh://user@host.de:/path/
+  (all files in that path will be transfered)
 
   
 User Input
