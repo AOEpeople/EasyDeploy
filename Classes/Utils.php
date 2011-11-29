@@ -38,6 +38,25 @@ class EasyDeploy_Utils {
 		}		
 		return $result;				
 	}
+	
+	/**
+	 * Helper to let a user select between diffrent options
+	 * @param $message
+	 * @param $options
+	 */
+	static public function userSelectionInput($message,array $options) {		
+		echo $message.PHP_EOL;
+		$validKeys=array();
+		foreach ($options as $k=>$v) {
+			$validKeys[]=$k;
+			echo '    ['.$k.'] '.$v.PHP_EOL;				
+		}
+		$result = self::userInput('Please select');
+		while (!in_array($result,$validKeys)) {
+			$result = self::userInput('WRONG Input - Please select');
+		}				
+		return $options[$result];				
+	}
 
 	static public function includeAllForRollback() {
 		require_once(dirname(__FILE__) . '/RemoteServer.php');
