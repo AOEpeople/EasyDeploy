@@ -17,9 +17,9 @@ class EasyDeploy_DeployService {
 	);
 
 	/**
-	 * @var string
+	 * @var boolean
 	 */
-	private $createBackupBeforeInstalling = '1';
+	private $createBackupBeforeInstalling = true;
 
 	/**
 	 * 
@@ -119,7 +119,7 @@ class EasyDeploy_DeployService {
 		// copy package to local deliveryfolder:
 		if(strpos($from,'http://') === 0) {
 			$parsedUrlParts=parse_url($from);
-			$server->wgetDownload($parsedUrlParts['scheme'].'://'.$parsedUrlParts['path'], $to, @$parsedUrlParts['user'], @$parsedUrlParts['pass']);
+			$server->wgetDownload($parsedUrlParts['scheme'].'://'.$parsedUrlParts['host'].'/'.$parsedUrlParts['path'], $to, @$parsedUrlParts['user'], @$parsedUrlParts['pass']);
 		}
 		else if (strpos($from,'ssh://') === 0) {
 			//ssh://user@server:path
@@ -149,29 +149,37 @@ class EasyDeploy_DeployService {
 	 * @param $packagePath
 	 *
 	 */
-	public function installPackage(EasyDeploy_AbstractServer $server, $packagePath) {		
+	public function installPackage(EasyDeploy_AbstractServer $server, $packageDeliveryPath) {
 		if (!isset($this->systemPath) || $this->systemPath == '') {
 			throw new Exception('SystemPath not set');
-        }
-        
+		}
+ 
 		if (!isset($this->environmentName) || $this->environmentName == '') {
 			throw new Exception('Environment name not set');
         }
-
+ 
 		// get package and copy to deliveryfolder
-		$packageBaseName = pathinfo($packagePath, PATHINFO_BASENAME);
-		$packageFileName = substr($packageBaseName, 0, strpos($packageBaseName, '.'));
-		$packageDeliveryFolder = pathinfo($packagePath, PATHINFO_DIRNAME);
-		$releaseVersion = basename($packageDeliveryFolder);
-
+		$packageDeliveryFolder = pathinfo($packageDeliveryPath, PATHINFO_DIRNAME);
+ 
 		// unzip package
-		$releasePackageName = $server->run('find ' . $packageDeliveryFolder . ' -type f -name "' . $this->projectName . '-' . $releaseVersion . '*.tar.gz" | sort | tail -n 1', FALSE, TRUE);
+		if (!$server->isFile($packageDeliveryPath)) {
+			echo 'Try to detect Package by convention "Projectname-Releasename*".tar.gz.'.PHP_EOL;
+			$_releaseVersion = basename($packageDeliveryFolder);
+			$releasePackageName = $server->run('find ' . $packageDeliveryFolder . ' -type f -name "' . $this->projectName . '-' . $_releaseVersion . '*.tar.gz" | sort | tail -n 1', FALSE, TRUE);
+		}
+		else {
+			$releasePackageName = pathinfo($packageDeliveryPath, PATHINFO_BASENAME);        // get filename, results in something like "solrconf.tar.gz"
+		}
+ 
+		if (!$server->isFile($packageDeliveryFolder .'/'.$releasePackageName)) {
+			throw new Exception('Something went wrong! - I found no file to extract in "'.$packageDeliveryFolder .'/'.$releasePackageName.'"');
+		}
+		//extract
 		$server->run('cd ' . $packageDeliveryFolder . '; tar -xzf ' . $releasePackageName);
-
-		$this->installStrategy->installSteps($packageDeliveryFolder, $this->projectName, $this, $server);
-			
+		$packageFileName=substr($releasePackageName,0,strpos($releasePackageName,'.')); //cuts file appendix, result in something like "solrconf"
+		$this->installStrategy->installSteps($packageDeliveryFolder, $packageFileName, $this, $server);
 		// delete unzipped folder
-		$server->run('rm -rf ' . $packageDeliveryFolder . '/' . $this->projectName);
+		$server->run('rm -rf ' . $packageDeliveryFolder . '/' . $packageFileName);
 	}
 
 	/**
@@ -262,23 +270,20 @@ class EasyDeploy_DeployService {
 	}
 
 	/**
-	 * Default is set to "1"
+	 * Default is set to true
 	 *
-	 * @param string $createBackup
+	 * @param boolean $createBackup
 	 * @return void
 	 */
 	public function setCreateBackupBeforeInstalling($createBackup) {
-		$createBackup = strtolower($createBackup);
-		if ($createBackup === 'n' || $createBackup === 'no' || $createBackup === '0') {
-			$this->createBackupBeforeInstalling = '0';
-		}
+		$this->createBackupBeforeInstalling = (boolean) $createBackup;
 	}
 
 	/**
 	 * Indicate that a fresh backup of master system should be done
 	 * before the installation starts.
 	 *
-	 * @return string
+	 * @return boolean
 	 */
 	public function getCreateBackupBeforeInstalling() {
 		return $this->createBackupBeforeInstalling;

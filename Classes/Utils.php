@@ -52,6 +52,7 @@ class EasyDeploy_Utils {
 		require_once(dirname(__FILE__) . '/DeployService.php');
 		require_once(dirname(__FILE__) . '/InstallStrategy/Interface.php');
 		require_once(dirname(__FILE__) . '/InstallStrategy/PHPInstaller.php');
+		require_once(dirname(__FILE__) . '/InstallStrategy/WebProjectPHPInstaller.php');
 
 		self::printWelcomeScreen();
 
