@@ -90,11 +90,8 @@ c) SSH (SCP)
 User Input
 ------------------------------
 If you need user input to get some values you need, you can use the Utils Class like this:
-
 ::
 	EasyDeploy_Utils::userInput('Your input');
-	
-::
 	EasyDeploy_Utils::userInput('Select between',array('option1','option2'));
 
 You can also get Parameters that are passed to the Installscript (like deploy.php --parameter=value )
@@ -110,10 +107,10 @@ Using own Installstrategie
 
 The InstallStrategie Object is responsible to Install the extracted Installation package.
 The PHPInstaller Strategie that ships with the Tool is bound to our specific Installationscripts: 
+
 * Per convention every package is self installable and the strategie just calls the Installscript in the package.
  
 However you might want to use a own Installstrategie (maybe just a simple one that copys files to the target systemPath). So you can write your own Strategie and pass this to the Deployservice:
- 
 ::
 	<?php
 	$deployer = new EasyDeploy_DeployService(new MyOwnInstallByCopyStrategie());
