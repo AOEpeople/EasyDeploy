@@ -110,9 +110,9 @@ Using own Installstrategie
 
 The InstallStrategie Object is responsible to Install the extracted Installation package.
 The PHPInstaller Strategie that ships with the Tool is bound to our specific Installationscripts: 
- - Per convention every package is self installable and the strategie just calls the Installscript in the package.
+* Per convention every package is self installable and the strategie just calls the Installscript in the package.
  
- However you might want to use a own Installstrategie (maybe just a simple one that copys files to the target systemPath). So you can write your own Strategie and pass this to the Deployservice:
+However you might want to use a own Installstrategie (maybe just a simple one that copys files to the target systemPath). So you can write your own Strategie and pass this to the Deployservice:
  
 ::
 	<?php
