@@ -32,7 +32,7 @@ class EasyDeploy_Utils {
 	 */
 	static public function userInput($message) {		
 		$result =  self::readFromCommandLine($message);
-		if (empty($result)) {
+		if ($result == '') {
 				echo self::formatMessage('Empty values not allowed!', self::MESSAGE_TYPE_WARNING) . chr(10);
 				return self::userInput($message);
 		}		
