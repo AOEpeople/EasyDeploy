@@ -39,29 +39,31 @@ So a simple script could look like this:
 	<?php
 	require_once dirname(__FILE__) . '/EasyDeploy/Classes/Utils.php';
 	EasyDeploy_Utils::includeAll();
+	
 
-	$projectName = 'proalpha';
-	$releaseDirectory = 'ssh://your.name@your.server:/path/releases/%s';
+	//where to get the package from
+	$packagePath = 'ssh://your.name@yourbuildserver.de:/path/releases/latest/myproject.tar.gz';
+	// local path on server where the package should be downloaded to before it is installed:
 	$deliveryDirectory = '/path/delivery';
+	
+	//more properties the instalation sxript wants to know:
+	$projectName = 'myproject';
 	$backupDirectory = '/path/backup';
-	$systemRootDirectory = '/var/www/project';
-	$server = new EasyDeploy_LocalServer();
+	$environment='production';
+	$releaseVersion='release1';
+	//target path for the installation (where should it install to)
+	$systemPath = '/var/www/project/production';
 
-	$releaseVersion = EasyDeploy_Utils::userInput('Enter release no you want to install: ');
-	$environment = EasyDeploy_Utils::userInput('Enter environment to install (staging|production): ');
-	$createBackup = EasyDeploy_Utils::userInput('Create backup before installing the release: ');
-
+	$server = new EasyDeploy_RemoteServer('www.myproject.com');
 	$deployer = new EasyDeploy_DeployService();
 	$deployer->setProjectName($projectName);
-	$deployer->setCreateBackupBeforeInstalling($createBackup);
 	$deployer->setDeliveryFolder($deliveryDirectory);
 	$deployer->setDeployerUnixGroup('www-data');
-	$deployer->setSystemPath($systemRootDirectory);
+	$deployer->setSystemPath($systemPath);
 	$deployer->setBackupstorageroot($backupDirectory);
-
-	try {
-		$deployer->setEnvironmentName($environment);
-		$deployer->deploy($server, $releaseVersion, sprintf($releaseDirectory, $releaseVersion));
+	$deployer->setEnvironmentName($environment);
+	try {		
+		$deployer->deploy($server, $releaseVersion, $packagePath);
 	} catch (EasyDeploy_CommandFailedException $e) {
 		print EasyDeploy_Utils::formatMessage(rtrim($e->getMessage()), EasyDeploy_Utils::MESSAGE_TYPE_ERROR) . PHP_EOL;
 		print EasyDeploy_Utils::formatMessage('Exiting deployment for release: "' . $releaseVersion . '"', EasyDeploy_Utils::MESSAGE_TYPE_ERROR) . PHP_EOL . PHP_EOL;
@@ -73,7 +75,7 @@ On the remote Server the package is downloaded via rsync from "yourbuildserver.d
 Supported Packagepaths
 ------------------------------
 
-In the example above the $releaseDirectory was available on a build server. There are other possibilities:
+In the example above the $packagePath was available on a build server. There are other possibilities:
 
 a) Local file:
   Example Package Path: /home/user/mypackage.tar.gz
@@ -87,6 +89,8 @@ c) SSH (SCP)
   
 User Input
 ------------------------------
+If you need user input to get some values you need, you can use the Utils Class like this:
+
 ::
 	EasyDeploy_Utils::userInput('Your input');
 	
@@ -113,4 +117,15 @@ The PHPInstaller Strategie that ships with the Tool is bound to our specific Ins
 ::
 	<?php
 	$deployer = new EasyDeploy_DeployService(new MyOwnInstallByCopyStrategie());
+	
+Advanced EasyDeploy Use-Cases
+------------------------------
+
+With this Toolset you could build new Deploymentscripts and solve some use-cases like:
+
+* Provide Walkthrough Installation Scripts that stops and ask for certain User Input
+* Deploy to several Servers:
+* * You can simple loop through an array of servers and deploy to them
+* * Together with Tools like Threadi ( https://github.com/danielpoe/Threadi ) you can open seperate processes for each server
+* Deploy different packages: For example you might want to Deploy a WebApplication, then a Varnishconfiguration and afer this some Cronjobs..
 	
