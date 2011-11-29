@@ -47,6 +47,7 @@ So a simple Script, that only uses the server object to execute shell commands c
 	
 Of course this won't be a typical deployment script - but gives some idea.
 EasyDeploy has another class "DeployService". The purpose of this class is to trigger a deploymentprocess following this steps:
+
 * A Package is downloaded from a given path (see below for the supported syntax) to a given deliver folder on the server. Therefore a subfolder with the given releasename is created in the delivery folder. 
 * The package is unpacked
 * An InstallationStrategy is triggered to Install this package. This InstallStrategy can read all the relevant properties from the DeployService - like the name of the environment, targetpath for the installation...
