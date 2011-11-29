@@ -157,10 +157,6 @@ class EasyDeploy_DeployService {
 		if (!isset($this->environmentName) || $this->environmentName == '') {
 			throw new Exception('Environment name not set');
         }
-		$this->pathToLocalConf = sprintf($this->pathToLocalConf, $this->systemPath . '/' . $this->environmentName);
-		if (is_file($this->pathToLocalConf)) {
-			$server->run('echo "" >> ' . sprintf($this->pathToLocalConf, $this->systemPath . '/' . $this->environmentName));
-		}
 
 		// get package and copy to deliveryfolder
 		$packageBaseName = pathinfo($packagePath, PATHINFO_BASENAME);
