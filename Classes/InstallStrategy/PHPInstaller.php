@@ -4,7 +4,9 @@
  * Default Installer Strategie for the PHP Installer: Just executes the installscript that is delivered within the package
  */
 class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrategy_Interface {
-	
+
+	protected $phpbinary = 'php';
+
 	/**
 	 * @param string $packageDeliveryFolder
 	 * @param string $packageFileName
@@ -19,9 +21,18 @@ class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrat
 		if ($deployService->getCreateBackupBeforeInstalling()) {
 			$additionalParameters =' --createNewMasterBackup=1';
 		}
-		$server->run('php ' . $packageDeliveryFolder . '/' . $packageFileName . '/installbinaries/install.php \
+		$server->run($this->phpbinary . ' ' . $packageDeliveryFolder . '/' . $packageFileName . '/installbinaries/install.php \
 			--systemPath="' . $deployService->getSystemPath()  . '" \
 			--backupstorageroot="' . $deployService->getBackupstorageroot() . '" \
 			--environmentName="' . $deployService->getEnvironmentName() . '"'.$additionalParameters, TRUE);
+	}
+
+	public function setPHPBinary($bin) {
+		if (file_exists($bin) && is_executable($bin)) {
+			$this->phpbinary = $bin;
+		} else {
+			print EasyDeploy_Utils::formatMessage('PHP binary '.$bin.' does not exist or is not executable.', EasyDeploy_Utils::MESSAGE_TYPE_WARNING);
+		}
+	
 	}
 }
