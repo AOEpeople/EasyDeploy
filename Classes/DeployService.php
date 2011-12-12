@@ -135,20 +135,20 @@ class EasyDeploy_DeployService {
 		return $to.$baseName;
 	}
 
-	/**
-	 * Deploys to the given server
-	 * @param \EasyDeploy_AbstractServer|\EasyDeploy_RemoteServer $server
-	 * @param $packagePath
-	 *
-	 */
-	public function installPackage(EasyDeploy_AbstractServer $server, $packageDeliveryPath) {
-		if (!isset($this->systemPath) || $this->systemPath == '') {
-			throw new Exception('SystemPath not set');
+        /**
+         * Deploys to the given server
+         * @param \EasyDeploy_AbstractServer|\EasyDeploy_RemoteServer $server
+         * @param $packagePath
+         *
+         */
+        public function installPackage(EasyDeploy_AbstractServer $server, $packageDeliveryPath) {
+                if (!isset($this->systemPath) || $this->systemPath == '') {
+                        throw new Exception('SystemPath not set');
+                }
+
+                if (!isset($this->environmentName) || $this->environmentName == '') {
+                        throw new Exception('Environment name not set');
 		}
- 
-		if (!isset($this->environmentName) || $this->environmentName == '') {
-			throw new Exception('Environment name not set');
-        }
  
 		// get package and copy to deliveryfolder
 		$packageDeliveryFolder = pathinfo($packageDeliveryPath, PATHINFO_DIRNAME);
@@ -158,9 +158,11 @@ class EasyDeploy_DeployService {
 			echo 'Try to detect Package by convention "Projectname-Releasename*".tar.gz.'.PHP_EOL;
 			$_releaseVersion = basename($packageDeliveryFolder);
 			$releasePackageName = $server->run('find ' . $packageDeliveryFolder . ' -type f -name "' . $this->projectName . '-' . $_releaseVersion . '*.tar.gz" | sort | tail -n 1', FALSE, TRUE);
-		}
-		else {
+			$releasePackageName = trim(basename($releasePackageName));
+			$packageFileName=$this->projectName;
+		} else {
 			$releasePackageName = pathinfo($packageDeliveryPath, PATHINFO_BASENAME);        // get filename, results in something like "solrconf.tar.gz"
+			$packageFileName=substr($releasePackageName,0,strpos($releasePackageName,'.')); //cuts file appendix, result in something like "solrconf"
 		}
  
 		if (!$server->isFile($packageDeliveryFolder .'/'.$releasePackageName)) {
@@ -168,7 +170,6 @@ class EasyDeploy_DeployService {
 		}
 		//extract
 		$server->run('cd ' . $packageDeliveryFolder . '; tar -xzf ' . $releasePackageName);
-		$packageFileName=substr($releasePackageName,0,strpos($releasePackageName,'.')); //cuts file appendix, result in something like "solrconf"
 		$this->installStrategy->installSteps($packageDeliveryFolder, $packageFileName, $this, $server);
 		// delete unzipped folder
 		$server->run('rm -rf ' . $packageDeliveryFolder . '/' . $packageFileName);
