@@ -93,13 +93,13 @@ class EasyDeploy_DeployService {
 		
 		//$fileName=substr($baseName,0,strpos($baseName,'.'));
 		if (is_file($to.$baseName)) {
-			echo 'File "'.$to.$baseName.'" already existend! Skipping transfer!';
+			echo 'File "'.$to.$baseName.'" already exists! Skipping transfer!';
 			return $to.$baseName;
 		}
 		if (!$server->isDir($to)) {
 			$server->run('mkdir '.$to);
 			if (!$server->isDir($to)) {
-				throw new Exception('Targetfolder "'.$to.'" not existend on server!');
+				throw new Exception('Targetfolder "'.$to.'" does not exist on server!');
 			}
 			if (isset($this->deployerUnixGroup)) {
                   $server->run('chgrp '.$this->deployerUnixGroup.' '.$to);
@@ -124,7 +124,7 @@ class EasyDeploy_DeployService {
 			$server->copy($from,$to);
 		}
 		else {
-			throw new EasyDeploy_Exception_UnknownSourceFormatException($from.' File not existend or it is a unknown source deglaration!');
+			throw new EasyDeploy_UnknownSourceFormatException($from.' File does not exist or is an unknown source declaration!');
 		}
 		
 	
