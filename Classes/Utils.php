@@ -193,6 +193,8 @@ class EasyDeploy_Utils {
 	 * @return void
 	 */
 	static public function printWelcomeScreen() {
+		ob_end_flush();
+
 		$message = <<<EOT
 		###################################################
 		###                                             ###
