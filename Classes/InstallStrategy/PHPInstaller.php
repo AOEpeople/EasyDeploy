@@ -22,7 +22,7 @@ class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrat
 			$additionalParameters =' --createNewMasterBackup=1';
 		}
 		$server->run($this->phpbinary . ' ' . $packageDeliveryFolder . '/' . $packageFileName . '/installbinaries/install.php \
-			--systemPath="' . $deployService->getSystemPath()  . '" \
+			--systemPath="' . $this->getSystemPath( $deployService )  . '" \
 			--backupstorageroot="' . $deployService->getBackupstorageroot() . '" \
 			--environmentName="' . $deployService->getEnvironmentName() . '"'.$additionalParameters, TRUE);
 	}
@@ -33,6 +33,15 @@ class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrat
 		} else {
 			print EasyDeploy_Utils::formatMessage('PHP binary '.$bin.' does not exist or is not executable.', EasyDeploy_Utils::MESSAGE_TYPE_WARNING);
 		}
+	}
 	
+	/**
+	 * Gets relevant system path (path for installing the package) based on the infos in the deployservice
+	 * 
+	 * @param EasyDeploy_DeployService $deployService
+	 * @return string
+	 */
+	protected function getSystemPath(EasyDeploy_DeployService $deployService) {
+		return $deployService->getSystemPath();
 	}
 }
