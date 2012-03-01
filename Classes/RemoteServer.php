@@ -54,10 +54,10 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	 */
 	public function run($command, $withInteraction = FALSE, $returnOutput = FALSE) {
 		if ($withInteraction) {
-			$shellCommand = 'ssh -t';
+			$shellCommand = 'ssh -t -A';
 		}
 		else {
-			$shellCommand = 'ssh';
+			$shellCommand = 'ssh -A';
 		}
 		$shellCommand .= ' ' . ((!is_null($this->userName)) ? $this->userName . '@' : '') . $this->host.' '.escapeshellarg($command);
 

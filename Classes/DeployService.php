@@ -9,11 +9,6 @@ require_once(dirname(__FILE__).'/Exception/UnknownSourceFormatException.php');
 class EasyDeploy_DeployService {
 
 	/**
-	 * @var boolean
-	 */
-	private $createBackupBeforeInstalling = true;
-
-	/**
 	 * 
 	 * @var $deliveryFolder string
 	 */
@@ -244,6 +239,7 @@ class EasyDeploy_DeployService {
 	public function setDeployerUnixGroup($deployerUnixGroup) {
 		$this->deployerUnixGroup = $deployerUnixGroup;
 	}
+	
 	/**
 	 * @return EasyDeploy_InstallStrategy_Interface
 	 */
@@ -261,22 +257,14 @@ class EasyDeploy_DeployService {
 
 	/**
 	 * Default is set to true
-	 *
+	 * 
+	 * @depreciated this is a concept of the install strategy - you should pass a initialised strategie
+	 * 
 	 * @param boolean $createBackup
 	 * @return void
 	 */
 	public function setCreateBackupBeforeInstalling($createBackup) {
-		$this->createBackupBeforeInstalling = (boolean) $createBackup;
-	}
-
-	/**
-	 * Indicate that a fresh backup of master system should be done
-	 * before the installation starts.
-	 *
-	 * @return boolean
-	 */
-	public function getCreateBackupBeforeInstalling() {
-		return $this->createBackupBeforeInstalling;
+		$this->installStrategy->createBackupBeforeInstalling($createBackup);
 	}
 
 	/**
