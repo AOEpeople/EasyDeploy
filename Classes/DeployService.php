@@ -264,7 +264,7 @@ class EasyDeploy_DeployService {
 	 * @return void
 	 */
 	public function setCreateBackupBeforeInstalling($createBackup) {
-		$this->installStrategy->createBackupBeforeInstalling($createBackup);
+		$this->installStrategy->setCreateBackupBeforeInstalling($createBackup);
 	}
 
 	/**
