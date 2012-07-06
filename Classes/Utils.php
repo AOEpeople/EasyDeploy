@@ -52,10 +52,10 @@ class EasyDeploy_Utils {
 			echo '    ['.$k.'] '.$v.PHP_EOL;				
 		}
 		$result = self::userInput('Please select');
-		while (!in_array($result,$validKeys)) {
+		while (!in_array($result, $validKeys)) {
 			$result = self::userInput('WRONG Input - Please select');
-		}				
-		return $options[$result];				
+		}
+		return $options[$result];
 	}
 	
 	/**
@@ -171,8 +171,10 @@ class EasyDeploy_Utils {
 	 */
 	static public function readFromCommandLine($label = '') {
 		print $label . chr(10) . chr(9);
+
 		$fp = fopen('php://stdin', 'r');
-		$line = stream_get_line($fp, 8192, "\n");
+		$line = trim(fgets($fp));
+		// $line = stream_get_line($fp, 8192, "\n");
 		fclose($fp);
 
 		return $line;
