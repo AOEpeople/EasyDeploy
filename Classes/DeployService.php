@@ -81,9 +81,11 @@ class EasyDeploy_DeployService {
 	 * @param string $from   
 	 * @param string $to
 	 * @return string	The path to the downloaded file
+	 * @throws EasyDeploy_Exception_UnknownSourceFormatException
+	 * @throws Exception
 	 */
 	public function download(EasyDeploy_AbstractServer $server, $from, $to) {
-		$baseName=pathinfo($from,PATHINFO_BASENAME);
+		$baseName = pathinfo($from,PATHINFO_BASENAME);
 		$to = EasyDeploy_Utils::appendDirectorySeperator($to);
 		
 		//$fileName=substr($baseName,0,strpos($baseName,'.'));
@@ -119,7 +121,7 @@ class EasyDeploy_DeployService {
 			$server->copy($from,$to);
 		}
 		else {
-			throw new EasyDeploy_UnknownSourceFormatException($from.' File does not exist or is an unknown source declaration!');
+			throw new EasyDeploy_Exception_UnknownSourceFormatException($from.' File does not exist or is an unknown source declaration!');
 		}
 		
 	
@@ -130,19 +132,20 @@ class EasyDeploy_DeployService {
 		return $to.$baseName;
 	}
 
-        /**
-         * Deploys to the given server
-         * @param \EasyDeploy_AbstractServer|\EasyDeploy_RemoteServer $server
-         * @param $packagePath
-         *
-         */
-        public function installPackage(EasyDeploy_AbstractServer $server, $packageDeliveryPath) {
-                if (!isset($this->systemPath) || $this->systemPath == '') {
-                        throw new Exception('SystemPath not set');
-                }
+	/**
+	 * Deploys to the given server
+	 *
+	 * @param EasyDeploy_AbstractServer $server
+	 * @param string $packageDeliveryPath
+	 * @throws Exception
+	 */
+	public function installPackage(EasyDeploy_AbstractServer $server, $packageDeliveryPath) {
+		if (!isset($this->systemPath) || $this->systemPath == '') {
+			throw new Exception('SystemPath not set');
+		}
 
-                if (!isset($this->environmentName) || $this->environmentName == '') {
-                        throw new Exception('Environment name not set');
+		if (!isset($this->environmentName) || $this->environmentName == '') {
+			throw new Exception('Environment name not set');
 		}
  
 		// get package and copy to deliveryfolder
