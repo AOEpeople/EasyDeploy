@@ -9,11 +9,11 @@ require_once(dirname(__FILE__).'/Exception/UnknownSourceFormatException.php');
 class EasyDeploy_DeployService {
 
 	/**
-	 * 
+	 *
 	 * @var $deliveryFolder string
 	 */
 	private $deliveryFolder;
-	
+
 	/**
 	 * Environmentname for the installation (e.g. "production") This might be required by the install process to adjust environment specifc settings
 	 * @var unknown_type
@@ -34,7 +34,7 @@ class EasyDeploy_DeployService {
 	 * @var string
 	 */
 	private $deployerUnixGroup;
-	
+
 	/**
 	 * @var EasyDeploy_InstallStrategy_Interface
 	 */
@@ -62,9 +62,9 @@ class EasyDeploy_DeployService {
 	 * @param EasyDeploy_AbstractServer $server
 	 * @param string $releaseName
 	 * @param string $packageSourcePath
-	 *  
+	 *
 	 */
-	public function deploy(EasyDeploy_AbstractServer $server, $releaseName, $packageSourcePath) {	
+	public function deploy(EasyDeploy_AbstractServer $server, $releaseName, $packageSourcePath) {
 		if (!$server->isDir($this->deliveryFolder)) {
 			throw new Exception($this->deliveryFolder.' deliveryFolder not existend on server!');
 		}
@@ -76,9 +76,9 @@ class EasyDeploy_DeployService {
 	/**
 	 * Downloads the specified file (from) to the local directoy (to)
 	 * $from can be a local file or a remote file (http:// and ssh:// supported)
-	 * 
+	 *
 	 * @param EasyDeploy_AbstractServer $server
-	 * @param string $from   
+	 * @param string $from
 	 * @param string $to
 	 * @return string	The path to the downloaded file
 	 * @throws EasyDeploy_Exception_UnknownSourceFormatException
@@ -87,7 +87,7 @@ class EasyDeploy_DeployService {
 	public function download(EasyDeploy_AbstractServer $server, $from, $to) {
 		$baseName = pathinfo($from,PATHINFO_BASENAME);
 		$to = EasyDeploy_Utils::appendDirectorySeperator($to);
-		
+
 		//$fileName=substr($baseName,0,strpos($baseName,'.'));
 		if (is_file($to.$baseName)) {
 			echo 'File "'.$to.$baseName.'" already exists! Skipping transfer!';
@@ -103,8 +103,8 @@ class EasyDeploy_DeployService {
                   $server->run('chmod g+rws '.$to);
 			}
 		}
-		
-		
+
+
 		// copy package to local deliveryfolder:
 		if(strpos($from,'http://') === 0) {
 			$parsedUrlParts=parse_url($from);
@@ -123,8 +123,8 @@ class EasyDeploy_DeployService {
 		else {
 			throw new EasyDeploy_Exception_UnknownSourceFormatException($from.' File does not exist or is an unknown source declaration!');
 		}
-		
-	
+
+
 		//fix permissions of downloaded package
 		if (isset($this->deployerUnixGroup)) {
 			$server->run('chgrp '.$this->deployerUnixGroup.' '. $to);
@@ -147,10 +147,10 @@ class EasyDeploy_DeployService {
 		if (!isset($this->environmentName) || $this->environmentName == '') {
 			throw new Exception('Environment name not set');
 		}
- 
+
 		// get package and copy to deliveryfolder
 		$packageDeliveryFolder = pathinfo($packageDeliveryPath, PATHINFO_DIRNAME);
- 
+
 		// unzip package
 		if (!$server->isFile($packageDeliveryPath)) {
 			echo 'Try to detect Package by convention "Projectname-Releasename*".tar.gz.'.PHP_EOL;
@@ -162,7 +162,7 @@ class EasyDeploy_DeployService {
 			$releasePackageName = pathinfo($packageDeliveryPath, PATHINFO_BASENAME);        // get filename, results in something like "solrconf.tar.gz"
 			$packageFileName=substr($releasePackageName,0,strpos($releasePackageName,'.')); //cuts file appendix, result in something like "solrconf"
 		}
- 
+
 		if (!$server->isFile($packageDeliveryFolder .'/'.$releasePackageName)) {
 			throw new Exception('Something went wrong! - I found no file to extract in "'.$packageDeliveryFolder .'/'.$releasePackageName.'"');
 		}
@@ -242,7 +242,7 @@ class EasyDeploy_DeployService {
 	public function setDeployerUnixGroup($deployerUnixGroup) {
 		$this->deployerUnixGroup = $deployerUnixGroup;
 	}
-	
+
 	/**
 	 * @return EasyDeploy_InstallStrategy_Interface
 	 */
@@ -260,13 +260,14 @@ class EasyDeploy_DeployService {
 
 	/**
 	 * Default is set to true
-	 * 
+	 *
 	 * @depreciated this is a concept of the install strategy - you should pass a initialised strategie
-	 * 
+	 *
 	 * @param boolean $createBackup
 	 * @return void
 	 */
 	public function setCreateBackupBeforeInstalling($createBackup) {
+		echo EasyDeploy_Utils::formatMessage('setCreateBackupBeforeInstalling is depreciated - please use the method in the proper installstrategy',EasyDeploy_Utils::MESSAGE_TYPE_WARNING);
 		$this->installStrategy->setCreateBackupBeforeInstalling($createBackup);
 	}
 

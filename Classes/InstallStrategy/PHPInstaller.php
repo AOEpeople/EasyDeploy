@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Default Installer Strategie for the PHP Installer: Just executes the installscript that is delivered within the package
+ * Default Installer Strategie for the PHP Installer:
+ * Just executes the installscript that is delivered within the package
+ * Depends on a package with proper install binaries
+ *
  */
 class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrategy_Interface {
 
@@ -28,6 +31,11 @@ class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrat
 	 */
 	public function installSteps($packageDeliveryFolder, $packageFileName, EasyDeploy_DeployService $deployService, EasyDeploy_AbstractServer $server) {
 		$additionalParameters = '';
+
+		if (!$server->isDir($packageDeliveryFolder . '/' . $packageFileName . '/installbinaries')) {
+			throw new Exception('No Installbinaries are available in the extraced package!');
+		}
+
 			// fix permissions
 		$server->run('chmod -R ug+x '.$packageDeliveryFolder.'/'.$packageFileName.'/installbinaries');
 

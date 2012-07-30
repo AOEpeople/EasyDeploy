@@ -2,7 +2,7 @@
 
 /**
  * Static helper functions
- * 
+ *
  * @author Daniel Pötzinger
  */
 class EasyDeploy_Utils {
@@ -30,26 +30,26 @@ class EasyDeploy_Utils {
 	 * @param string $message
 	 * @return string
 	 */
-	static public function userInput($message) {		
+	static public function userInput($message) {
 		$result =  self::readFromCommandLine($message);
 		if ($result == '') {
 				echo self::formatMessage('Empty values not allowed!', self::MESSAGE_TYPE_WARNING) . chr(10);
 				return self::userInput($message);
-		}		
-		return $result;				
+		}
+		return $result;
 	}
-	
+
 	/**
 	 * Helper to let a user select between diffrent options
 	 * @param $message
 	 * @param $options
 	 */
-	static public function userSelectionInput($message,array $options) {		
+	static public function userSelectionInput($message,array $options) {
 		echo $message.PHP_EOL;
 		$validKeys=array();
 		foreach ($options as $k=>$v) {
 			$validKeys[]=$k;
-			echo '    ['.$k.'] '.$v.PHP_EOL;				
+			echo '    ['.$k.'] '.$v.PHP_EOL;
 		}
 		$result = self::userInput('Please select');
 		while (!in_array($result, $validKeys)) {
@@ -57,7 +57,7 @@ class EasyDeploy_Utils {
 		}
 		return $options[$result];
 	}
-	
+
 	/**
 	 * Includes all relevant Classes and initialises date timezone
 	 * @return void
@@ -66,11 +66,16 @@ class EasyDeploy_Utils {
 		require_once(dirname(__FILE__) . '/RemoteServer.php');
 		require_once(dirname(__FILE__) . '/LocalServer.php');
 		require_once(dirname(__FILE__) . '/DeployService.php');
-		
+
 		require_once(dirname(__FILE__) . '/InstallStrategy/Interface.php');
 		require_once(dirname(__FILE__) . '/InstallStrategy/PHPInstaller.php');
 		require_once(dirname(__FILE__) . '/InstallStrategy/WebProjectPHPInstaller.php');
-		
+		require_once(dirname(__FILE__) . '/InstallStrategy/StepBasedInstaller.php');
+
+		require_once(dirname(__FILE__) . '/InstallStrategy/Steps/Interface.php');
+		require_once(dirname(__FILE__) . '/InstallStrategy/Steps/StepInfos.php');
+		require_once(dirname(__FILE__) . '/InstallStrategy/Steps/Copy.php');
+
 		require_once(dirname(__FILE__) . '/Rollback/Environment.php');
 		require_once(dirname(__FILE__) . '/Rollback/RollbackService.php');
 
@@ -81,7 +86,7 @@ class EasyDeploy_Utils {
 			date_default_timezone_set('Europe/Berlin');
 		}
 	}
-	
+
 	/**
 	 * Gets a value from command line arguments
 	 * If not set it returns false
@@ -93,12 +98,12 @@ class EasyDeploy_Utils {
 		if (!isset($params[$key])) {
 			return FALSE;
 		}
-		return $params[$key];		
+		return $params[$key];
 	}
-	
+
 	/**
 	 * Gets a value from command line arguments, If not set it promts for it on commandline
-	 * 
+	 *
 	 * @param string $key
 	 * @param string $message
 	 * @return string
@@ -106,8 +111,9 @@ class EasyDeploy_Utils {
 	static public function getParameterOrInput($key, $message) {
 		$result = self::getParameter($key);
 		if ($result === FALSE) {
-			return self::userInput($message);
+			$result = self::userInput($message);
 		}
+		return $result;
 	}
 
 	/**
@@ -122,10 +128,11 @@ class EasyDeploy_Utils {
 	static public function getParameterOrDefault($key, $default) {
 		$result = self::getParameter($key);
 		if ($result === FALSE) {
-			return $default;
+			$result = $default;
 		}
+		return $result;
 	}
-	
+
 	/**
 	 * Makes sure that paths ends with /
 	 * @param string $dir
@@ -140,7 +147,7 @@ class EasyDeploy_Utils {
 	}
 
 	/**
-	 * Parses command line parameters in the format --key="value" 
+	 * Parses command line parameters in the format --key="value"
 	 * @return array
 	 */
 	static private function getArvParameters() {
