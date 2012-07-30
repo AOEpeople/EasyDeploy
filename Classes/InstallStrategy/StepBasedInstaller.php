@@ -3,7 +3,7 @@
  * Installer Strategie for the PHP Installer.
  * Used for Webprojects, where the environmentname is appended to the systemPath per convention
  */
-class EasyDeploy_InstallStrategy_StepBasedInstaller extends EasyDeploy_InstallStrategy_Interface {
+class EasyDeploy_InstallStrategy_StepBasedInstaller implements EasyDeploy_InstallStrategy_Interface {
 
 	/**
 	 * @var array
