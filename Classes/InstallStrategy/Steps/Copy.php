@@ -18,13 +18,15 @@ class EasyDeploy_InstallStrategy_Steps_Copy implements EasyDeploy_InstallStrateg
 	public function process(EasyDeploy_AbstractServer $server, EasyDeploy_InstallStrategy_Steps_StepInfos $stepInfos) {
 		$targetFolder = $stepInfos->getDeployService()->getSystemPath();
 		if (!$server->isDir($targetFolder)) {
-			$server->run('mkdir -P '. $targetFolder);
+			$server->run('mkdir -p '. $targetFolder);
 		}
 		$sourceFolder = $this->getSourceFolder($stepInfos);
 		if (!$server->isDir($sourceFolder)) {
 			throw new Exception('Source Folder: "'. $sourceFolder.'" is not existend. You may want to explicitly give on by ->setSourceFolder');
 		}
-		$server->run('cp -R '. $sourceFolder. ' '. $targetFolder);
+		$sourceFolder = rtrim($sourceFolder,'/').'/';
+		$targetFolder = rtrim($targetFolder, '/') . '/';
+		$server->run('rsync -r '. $sourceFolder. ' '. $targetFolder);
 	}
 
 	/**
@@ -35,7 +37,7 @@ class EasyDeploy_InstallStrategy_Steps_Copy implements EasyDeploy_InstallStrateg
 	 * @return string
 	 */
 	private function getSourceFolder(EasyDeploy_InstallStrategy_Steps_StepInfos $stepInfos) {
-		if (empty($this->sourceFolder)) {
+		if (!empty($this->sourceFolder)) {
 			$sourceFolder = $this->sourceFolder;
 		}
 		else {
