@@ -27,7 +27,7 @@ abstract class EasyDeploy_AbstractServer {
 	abstract public function run($command, $withInteraction = FALSE, $returnOutput = FALSE);
 	
 	/**
-	 * copys a local file to the server
+	 * copies a local file to the server
 	 * 
 	 * @param string $from
 	 * @param string $to
@@ -55,7 +55,8 @@ abstract class EasyDeploy_AbstractServer {
 	
 	/**
 	 * @param string $command
-	 * @return array out, error, returncode
+     * @param boolean $returnOutput
+	 * @return array out, error, return code
 	 */
 	protected function executeCommand($command, $returnOutput = FALSE) {
 		$result = array();
@@ -98,14 +99,20 @@ abstract class EasyDeploy_AbstractServer {
 	public function getCurrentUsername() {
 		return trim( $this->run('whoami',FALSE,TRUE) );
 	}
-	
-	/**
-	 * Downloads a file from http with wget
-	 * @param string $from  the url that should be downloaded
-	 * @param string $to  download target
-	 * @param $user optional the http-auth user name
-	 * @param $password optional the http-auth password
-	 */
+
+    public function readLink($link){
+        return trim($this->run('readlink '. $link, FALSE, TRUE));
+    }
+
+    /**
+     * Downloads a file from http with wget
+     *
+     * @param string $from  the url that should be downloaded
+     * @param string $to  download target
+     * @param string $user optional the http-auth user name
+     * @param string $password optional the http-auth password
+     * @throws EasyDeploy_Exception_CommandFailedException
+     */
 	public function wgetDownload($from,$to,$user=null,$password=null) {
 		$options= '';
 		if (isset($user) && $user != '') {
@@ -116,5 +123,9 @@ abstract class EasyDeploy_AbstractServer {
 			throw new EasyDeploy_Exception_CommandFailedException('Error while downloading with wget: "'.$result.'"');
 		}
 	}
+
+    public function getHostname(){
+        return trim($this->run('hostname', FALSE, TRUE));
+    }
 	
 }
