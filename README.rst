@@ -46,9 +46,9 @@ So a simple Script, that only uses the server object to execute shell commands c
 
 
 Of course this won't be a typical deployment script - but gives some idea.
-EasyDeploy has another class "DeployService". The purpose of this class is to trigger a deploymentprocess following this steps:
+EasyDeploy has another class "DeployService". The purpose of this class is to trigger a deployment process following this steps:
 
-* A Package is downloaded from a given path (see below for the supported syntax) to a given deliver folder on the server. Therefore a subfolder with the given releasename is created in the delivery folder.
+* A Package is downloaded from a given path (see below for the supported syntax) to a given deliver folder on the server. Therefore a subfolder with the given release name is created in the delivery folder.
 * The package is unpacked
 * An InstallationStrategy is triggered to Install this package. This InstallStrategy can read all the relevant properties from the DeployService - like the name of the environment, targetpath for the installation...
 
@@ -66,7 +66,7 @@ So a deployment script could look like this:
 	//target path for the installation (where should it install to)
 	$systemPath = '/var/www/project/production';
 
-	//more properties the instalations strategie might want to know:
+	//more properties the installations strategy might want to know:
 	$projectName = 'myproject';
 	$backupDirectory = '/path/backup';
 	$environmentName='production';
@@ -91,8 +91,9 @@ So a deployment script could look like this:
 This will install the package on a remote server.
 
 The implemented flow in the DeployService is as following:
+
 * On the remote Server the package is downloaded (via rsync or other supported methods - see below)
-* It is stored on the concrete server in a deliverfolder
+* It is stored on the concrete server in a deliver folder
 * The package is untared
 * The installation is started, using the configured InstallStrategy
 
@@ -130,7 +131,7 @@ You can also get Parameters that are passed to the Installscript (like deploy.ph
 
 	$value = EasyDeploy_Utils::getParameterOrDefault('makebackup',1);
 
-Using Installstrategie
+Using Installstrategy
 ------------------------------
 
 The InstallStrategie Object is responsible to Install the extracted Installation package.

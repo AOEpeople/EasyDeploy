@@ -42,7 +42,7 @@ class EasyDeploy_Utils
     }
 
     /**
-     * Helper to let a user select between diffrent options
+     * Helper to let a user select between different options
      * @param $message
      * @param $options
      */
@@ -114,6 +114,7 @@ class EasyDeploy_Utils
         if ($result === FALSE) {
             return self::userInput($message);
         }
+        return $result;
     }
 
     /**
@@ -131,6 +132,7 @@ class EasyDeploy_Utils
         if ($result === FALSE) {
             return $default;
         }
+        return $result;
     }
 
     /**
@@ -148,7 +150,7 @@ class EasyDeploy_Utils
             if (in_array($result, array_keys($options))) {
                 return $result;
             } else {
-                throw new Exception('Given Parameter ' . $key . ' has unallowed Value. Allowed:' .implode(' ', array_keys($options)));
+                throw new Exception('Given Parameter ' . $key . ' is not an allowed value. Allowed:' .implode(' ', array_keys($options)));
             }
         } else {
             $result = self::userSelectionInput($message, $options);
