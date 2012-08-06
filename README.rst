@@ -15,7 +15,7 @@ The easiest usage is to use the *Server Classes to execute commands. The command
 ::
 	$server = new EasyDeploy_RemoteServer('www.aoemedia.de');
 	echo "Now listing the content of my home directory:';
-	server->run('ls -al');
+	$server->run('ls -al');
 
 In order to be able to run commands on a remoteserver you need to configure our ssh account to be able to login to the remoteserver via ssh without password:
 (simply create your very own security key and paste the public file into a file called “.ssh/authorized_keys” in the home directory for the server’s deployment user.
