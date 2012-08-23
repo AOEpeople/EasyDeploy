@@ -161,14 +161,15 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	 * @return boolean
 	 */
 	public function isLink($directory) {
-		$isLink = false;
-
 		try {
-			$this->run('if [ -L "' . $directory . '" ] ; then exit 0; else exit 1; fi');
-			$isLink = true;
+			$result = $this->run('if [ -L "' . $directory . '" ] ; then echo 1; else echo 0; fi', FALSE, TRUE);
+			if (trim($result) == 1) {
+				return true;
+			}
 		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+
 		}
 
-		return $isLink;
+		return false;
 	}
 }
