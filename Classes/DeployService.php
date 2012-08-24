@@ -266,13 +266,13 @@ class EasyDeploy_DeployService {
 	/**
 	 * Default is set to true
 	 *
-	 * @depreciated this is a concept of the install strategy - you should pass a initialised strategie
+	 * @deprecated this is a concept of the install strategy - you should pass a initialised strategie
 	 *
 	 * @param boolean $createBackup
 	 * @return void
 	 */
 	public function setCreateBackupBeforeInstalling($createBackup) {
-		echo EasyDeploy_Utils::formatMessage('setCreateBackupBeforeInstalling is depreciated - please use the method in the proper installstrategy',EasyDeploy_Utils::MESSAGE_TYPE_WARNING);
+		echo EasyDeploy_Utils::formatMessage('setCreateBackupBeforeInstalling is deprecated - please use the method in the proper installstrategy',EasyDeploy_Utils::MESSAGE_TYPE_WARNING);
 		$this->installStrategy->setCreateBackupBeforeInstalling($createBackup);
 	}
 
