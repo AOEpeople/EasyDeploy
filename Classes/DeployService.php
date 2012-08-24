@@ -46,6 +46,11 @@ class EasyDeploy_DeployService {
 	private $projectName;
 
 	/**
+	 * @var string
+	 */
+	private $additionalInstallerParameters = '';
+
+	/**
 	 * @param EasyDeploy_InstallStrategy_Interface|null $installStrategy
 	 * @return EasyDeploy_DeployService
 	 */
@@ -286,5 +291,18 @@ class EasyDeploy_DeployService {
 		return $this->projectName;
 	}
 
+	/**
+	 * @param string $additionalInstallerParameters
+	 */
+	public function setAdditionalInstallerParameters($additionalInstallerParameters) {
+		$this->additionalInstallerParameters = $additionalInstallerParameters;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdditionalInstallerParameters() {
+		return $this->additionalInstallerParameters;
+	}
 
 }

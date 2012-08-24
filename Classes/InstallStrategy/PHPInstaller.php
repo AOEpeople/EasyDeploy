@@ -30,7 +30,7 @@ class EasyDeploy_InstallStrategy_PHPInstaller implements EasyDeploy_InstallStrat
 	 * @param EasyDeploy_AbstractServer $server
 	 */
 	public function installSteps($packageDeliveryFolder, $packageFileName, EasyDeploy_DeployService $deployService, EasyDeploy_AbstractServer $server) {
-		$additionalParameters = '';
+		$additionalParameters = $deployService->getAdditionalInstallerParameters();
 
 		if (!$server->isDir($packageDeliveryFolder . '/' . $packageFileName . '/installbinaries')) {
 			throw new Exception('No Installbinaries are available in the extraced package!');
