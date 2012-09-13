@@ -93,12 +93,20 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	 * @throws Exception
 	 * @return void
 	 */
-	public function copyLocalFile($from, $to) {
-		if (!is_file($from)) {
-			throw new Exception($from . ' is not a file');
-		}
-		$this->executeCommand('rsync -avz ' . escapeshellarg($from) . ' ' . $this->host . ':' . escapeshellarg($to));
-	}
+    public function copyLocalFile($from,$to) {
+        if (!is_file($from)) {
+            throw new Exception($from.' is not a file');
+        }
+
+        $command = 'rsync -avz '.escapeshellarg($from).' '.$this->host.':'.escapeshellarg($to);
+        echo ' [' . $command . ']' . PHP_EOL;
+
+        $result = $this->executeCommand( $command, true );
+
+        if ($result['returncode'] != 0) {
+            throw new EasyDeploy_Exception_CommandFailedException($result['error']);
+        }
+    }
 
 
 	/**
