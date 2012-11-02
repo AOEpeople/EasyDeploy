@@ -71,9 +71,14 @@ class EasyDeploy_Utils
         require_once(dirname(__FILE__) . '/LocalServer.php');
         require_once(dirname(__FILE__) . '/DeployService.php');
 
+        require_once(dirname(__FILE__) . '/Exception/UnknownSourceFormatException.php');
+        require_once(dirname(__FILE__) . '/Exception/CommandFailedException.php');
+
         require_once(dirname(__FILE__) . '/InstallStrategy/Interface.php');
         require_once(dirname(__FILE__) . '/InstallStrategy/PHPInstaller.php');
         require_once(dirname(__FILE__) . '/InstallStrategy/WebProjectPHPInstaller.php');
+
+        require_once(dirname(__FILE__) . '/Helper/Downloader.php');
 
         require_once(dirname(__FILE__) . '/Rollback/Environment.php');
         require_once(dirname(__FILE__) . '/Rollback/RollbackService.php');

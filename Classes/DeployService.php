@@ -16,7 +16,7 @@ class EasyDeploy_DeployService {
 
 	/**
 	 * Environmentname for the installation (e.g. "production") This might be required by the install process to adjust environment specifc settings
-	 * @var unknown_type
+	 * @var string
 	 */
 	private $environmentName;
 	/**
@@ -50,16 +50,26 @@ class EasyDeploy_DeployService {
 	 */
 	private $additionalInstallerParameters = '';
 
+    /**
+     * @var EasyDeploy_Helper_Downloader
+     */
+    private $downloader;
+
 	/**
 	 * @param EasyDeploy_InstallStrategy_Interface|null $installStrategy
+     * @param EasyDeploy_Helper_Downloader $downloader
 	 * @return EasyDeploy_DeployService
 	 */
-	public function __construct(EasyDeploy_InstallStrategy_Interface $installStrategy = NULL) {
+	public function __construct(EasyDeploy_InstallStrategy_Interface $installStrategy = NULL, EasyDeploy_Helper_Downloader $downloader = NULL) {
 		if (is_null($installStrategy)) {
-			$this->setInstallStrategy(new EasyDeploy_InstallStrategy_PHPInstaller());
-		} else {
-			$this->setInstallStrategy($installStrategy);
+			$installStrategy = new EasyDeploy_InstallStrategy_PHPInstaller();
 		}
+        $this->setInstallStrategy($installStrategy);
+
+        if (is_null($downloader)) {
+            $downloader =  new EasyDeploy_Helper_Downloader();
+        }
+        $this->downloader = $downloader;
 	}
 
 	/**
@@ -90,51 +100,7 @@ class EasyDeploy_DeployService {
 	 * @throws Exception
 	 */
 	public function download(EasyDeploy_AbstractServer $server, $from, $to) {
-		$baseName = pathinfo($from,PATHINFO_BASENAME);
-		$to = EasyDeploy_Utils::appendDirectorySeperator($to);
-
-		//$fileName=substr($baseName,0,strpos($baseName,'.'));
-		if (is_file($to.$baseName)) {
-			echo 'File "'.$to.$baseName.'" already exists! Skipping transfer!';
-			return $to.$baseName;
-		}
-		if (!$server->isDir($to)) {
-			$server->run('mkdir '.$to);
-			if (!$server->isDir($to)) {
-				throw new Exception('Targetfolder "'.$to.'" does not exist on server!');
-			}
-			if (isset($this->deployerUnixGroup)) {
-                  $server->run('chgrp '.$this->deployerUnixGroup.' '.$to);
-                  $server->run('chmod g+rws '.$to);
-			}
-		}
-
-
-		// copy package to local deliveryfolder:
-		if(strpos($from,'http://') === 0) {
-			$parsedUrlParts=parse_url($from);
-			$server->wgetDownload($parsedUrlParts['scheme'].'://'.$parsedUrlParts['host'].'/'.$parsedUrlParts['path'], $to, @$parsedUrlParts['user'], @$parsedUrlParts['pass']);
-		}
-		else if (strpos($from,'ssh://') === 0) {
-			//ssh://user@server:path
-			$parsedUrlParts=parse_url($from);
-			$path = substr($from,strrpos($from,':')+1);
-			$command= 'rsync -avz '.$parsedUrlParts['user'].'@'.$parsedUrlParts['host'].':'.$path.' '.$to;
-			$server->run($command, TRUE);
-		}
-		else if (is_file($from)) {
-			$server->copy($from,$to);
-		}
-		else {
-			throw new EasyDeploy_Exception_UnknownSourceFormatException($from.' File does not exist or is an unknown source declaration!');
-		}
-
-
-		//fix permissions of downloaded package
-		if (isset($this->deployerUnixGroup)) {
-			$server->run('chgrp '.$this->deployerUnixGroup.' '. $to);
-		}
-		return $to.$baseName;
+        return $this->downloader->download($server,$from,$to,$this->deployerUnixGroup);
 	}
 
 	/**

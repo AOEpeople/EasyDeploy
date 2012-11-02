@@ -116,7 +116,7 @@ abstract class EasyDeploy_AbstractServer {
 	public function wgetDownload($from,$to,$user=null,$password=null) {
 		$options= '';
 		if (isset($user) && $user != '') {
-			$options = ' --http-user='.$user.' --http-password='.$password;
+			$options = ' --http-user="'.$user.'" --http-password="'.$password.'"';
 		}
 		$result = $this->run('cd '.$to.'; wget '.$options. ' '.$from, FALSE, TRUE);
 		if (strpos($result,'Invalid')) {
