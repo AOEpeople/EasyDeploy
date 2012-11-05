@@ -118,7 +118,7 @@ abstract class EasyDeploy_AbstractServer {
 		if (isset($user) && $user != '') {
 			$options = ' --http-user="'.$user.'" --http-password="'.$password.'"';
 		}
-		$result = $this->run('cd '.$to.'; wget '.$options. ' '.$from, FALSE, TRUE);
+		$result = $this->run('cd '.$to.'; wget '.$options. ' '.$from, FALSE, FALSE);
 		if (strpos($result,'Invalid')) {
 			throw new EasyDeploy_Exception_CommandFailedException('Error while downloading with wget: "'.$result.'"');
 		}
