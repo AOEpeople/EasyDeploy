@@ -86,7 +86,7 @@ class EasyDeploy_Utils
         self::printWelcomeScreen();
 
         if (ini_get('date.timezone') == '') {
-            echo self::formatMessage('Warning - timezone not set -using Europe/Berlin', self::MESSAGE_TYPE_WARNING) . PHP_EOL;
+            echo self::formatMessage('Warning - timezone not set -using Europe/Berlin', self::MESSAGE_TYPE_INFO) . PHP_EOL;
             date_default_timezone_set('Europe/Berlin');
         }
     }
@@ -228,7 +228,7 @@ class EasyDeploy_Utils
      */
     static public function formatMessage($message, $messageType = '')
     {
-        return '	' . $messageType . $message . "\033[0m";
+        return $messageType . $message . "\033[0m";
     }
 
     /**
@@ -240,11 +240,11 @@ class EasyDeploy_Utils
         while (ob_get_level() > 0) ob_end_flush();
 
         $message = <<<EOT
-		###################################################
-		###                                             ###
-		### A O E   P r o j e c t   D e p l o y m e n t ###
-		###                                             ###
-		###################################################
+    _   ___  ___
+   /_\ / _ \| __|
+  / _ \ (_) | _|
+ /_/ \_\___/|___|
+\033[1;33m\033[40m  P r o j e c t   D e p l o y m e n t   \033[0m
 
 
 EOT;
