@@ -21,6 +21,10 @@ abstract class EasyDeploy_AbstractServer {
 	 */
 	protected $logCommandsToScreen = true;
 
+	/**
+	 * @var string
+	 */
+	protected $internalTitle = '';
 
 	
 	
@@ -149,6 +153,22 @@ abstract class EasyDeploy_AbstractServer {
 	public function getLogCommandsToScreen()
 	{
 		return $this->logCommandsToScreen;
+	}
+
+	/**
+	 * @param string $internalTitle
+	 */
+	public function setInternalTitle($internalTitle)
+	{
+		$this->internalTitle = $internalTitle;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getInternalTitle()
+	{
+		return $this->internalTitle;
 	}
 	
 }
