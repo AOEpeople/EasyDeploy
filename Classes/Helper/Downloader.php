@@ -12,7 +12,7 @@ class EasyDeploy_Helper_Downloader {
 	 * $from can be a local file or a remote file (http:// and ssh:// supported)
 	 *
 	 * @param EasyDeploy_AbstractServer $server
-	 * @param string $from
+	 * @param string $from  supports local files, http:// and ssh:// protocols
 	 * @param string $to
      * @param string $deployerUnixGroup if set permissions are fixed
 	 * @return string The path to the downloaded file
@@ -38,7 +38,7 @@ class EasyDeploy_Helper_Downloader {
 			}
 		}
 
-		// copy package to local deliveryfolder:
+		// download depending on schema
 		if(strpos($from,'http://') === 0) {
 			$parsedUrlParts=parse_url($from);
 			$server->wgetDownload($parsedUrlParts['scheme'].'://'.$parsedUrlParts['host'].'/'.$parsedUrlParts['path'], $to, @$parsedUrlParts['user'], @$parsedUrlParts['pass']);
@@ -51,7 +51,7 @@ class EasyDeploy_Helper_Downloader {
 			$server->run($command, TRUE);
 		}
 		else if (is_file($from)) {
-			$server->copy($from,$to);
+			$server->copyLocalFile($from,$to);
 		}
 		else {
 			throw new EasyDeploy_Exception_UnknownSourceFormatException($from.' File does not exit or is an unknown source declaration!');

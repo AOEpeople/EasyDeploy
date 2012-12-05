@@ -39,6 +39,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	 */
 	private $privateKey;
 
+
 	/**
 	 *
 	 * @param string $host
@@ -74,10 +75,12 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		}
 		$shellCommand .= ' ' . ((!is_null($this->userName)) ? $this->userName . '@' : '') . $this->host . ' ' . escapeshellarg($command);
 
-		echo ' [' . $shellCommand . ']' . PHP_EOL;
+		if ($this->logCommandsToScreen) {
+			echo ' [' . $shellCommand . ']' . PHP_EOL;
+		}
 		$result = $this->executeCommand($shellCommand, $returnOutput);
 		if ($result['returncode'] != 0) {
-			throw new EasyDeploy_Exception_CommandFailedException($result['error']);
+			throw new EasyDeploy_Exception_CommandFailedException('"'.$command.'" failed:'.$result['error']);
 		}
 		if ($returnOutput) {
 			return $result['out'];
@@ -99,12 +102,13 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
         }
 
         $command = 'rsync -avz '.escapeshellarg($from).' '.$this->host.':'.escapeshellarg($to);
-        echo ' [' . $command . ']' . PHP_EOL;
-
+	    if ($this->logCommandsToScreen) {
+		    echo ' [' . $command . ']' . PHP_EOL;
+	    }
         $result = $this->executeCommand( $command, true );
 
         if ($result['returncode'] != 0) {
-            throw new EasyDeploy_Exception_CommandFailedException($result['error']);
+            throw new EasyDeploy_Exception_CommandFailedException($command.' '.$result['error']);
         }
     }
 

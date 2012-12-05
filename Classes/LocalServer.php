@@ -30,10 +30,12 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer
     public function run($command, $withInteraction = FALSE, $returnOutput = FALSE)
     {
         $shellCommand = $command;
-        print EasyDeploy_Utils::formatMessage('[' . rtrim($shellCommand) . ']', EasyDeploy_Utils::MESSAGE_TYPE_INFO) . PHP_EOL;
+	    if ($this->logCommandsToScreen) {
+            print EasyDeploy_Utils::formatMessage('[' . rtrim($shellCommand) . ']', EasyDeploy_Utils::MESSAGE_TYPE_INFO) . PHP_EOL;
+	    }
         $result = $this->executeCommand($shellCommand, $returnOutput);
         if ($result['returncode'] != 0) {
-            throw new EasyDeploy_Exception_CommandFailedException($result['error']);
+            throw new EasyDeploy_Exception_CommandFailedException('"'.$command.'" failed: '.$result['error']);
         }
         if ($returnOutput) {
             return $result['out'];

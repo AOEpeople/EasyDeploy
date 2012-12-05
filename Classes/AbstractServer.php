@@ -15,6 +15,13 @@ require_once(dirname(__FILE__).'/Exception/CommandFailedException.php');
  * Basic Server Class representing a Servernode
  */
 abstract class EasyDeploy_AbstractServer {
+
+	/**
+	 * @var bool
+	 */
+	protected $logCommandsToScreen = true;
+
+
 	
 	
 	/**
@@ -127,5 +134,21 @@ abstract class EasyDeploy_AbstractServer {
     public function getHostname(){
         return trim($this->run('hostname', FALSE, TRUE));
     }
+
+	/**
+	 * @param boolean $logCommandsToScreen
+	 */
+	public function setLogCommandsToScreen($logCommandsToScreen)
+	{
+		$this->logCommandsToScreen = $logCommandsToScreen;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getLogCommandsToScreen()
+	{
+		return $this->logCommandsToScreen;
+	}
 	
 }
