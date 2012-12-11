@@ -63,19 +63,22 @@ abstract class EasyDeploy_AbstractServer {
 	 * @return boolean
 	 */
 	abstract public function isFile($dir);
-	
+
 	/**
-	 * @param string $command
-     * @param boolean $returnOutput
-	 * @return array out, error, return code
+	 * @param $command
+	 * @param bool $returnOutput
+	 * @param resource/array $stdOutStreamDescriptor
+	 * @param resource/array $stdErrorStreamDescriptor
+	 * @return array
 	 */
-	protected function executeCommand($command, $returnOutput = FALSE) {
+	protected function executeCommand($command, $returnOutput = FALSE, $stdOutStreamDescriptor = STDOUT, $stdErrorStreamDescriptor = array("pipe", "w")) {
 		$result = array();
 		$descriptorspec = array(
 		   0 => STDIN,  // stdin is a pipe that the child will read from
-		   1 => STDOUT,  // stdout is a pipe that the child will write to
-		   2 => array("pipe", "w") // stderr is a file to write to
+		   1 => $stdOutStreamDescriptor,  // stdout is a pipe that the child will write to
+		   2 => $stdErrorStreamDescriptor // stderr is a file to write to
 		);
+		//if return Output is set we force the output stream descriptor
 		if ($returnOutput) {
 			$descriptorspec[1] = array("pipe", "w");
 		}
@@ -102,6 +105,19 @@ abstract class EasyDeploy_AbstractServer {
 			 $result['error'] = 'proc_open failed';
 		}
 		return $result;
+	}
+
+	/**
+	 * @param $returnOutput
+	 * @param $appendOutputToFile
+	 * @return array|resource
+	 */
+	protected function getStreamDescriptor($returnOutput, $appendOutputToFile) {
+		$stdOutStreamDescriptor = STDOUT;
+		if ($returnOutput === false && isset($appendOutputToFile) && is_file($appendOutputToFile)) {
+			$stdOutStreamDescriptor = array('file',$appendOutputToFile,'a' );
+		}
+		return $stdOutStreamDescriptor;
 	}
 	
 	/**

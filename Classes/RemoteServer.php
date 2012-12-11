@@ -60,10 +60,11 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	 * @param string $command
 	 * @param boolean $withInteraction   set to true if the command should stay open and wait for STDIN
 	 * @param boolean $returnOutput        set to true if you need the result - otherwise its directed to STDOUT
+	 * @param string  $appendOutputToFile	set to a valid existing file (on current OS context) to write the output directly to a file
 	 * @throws EasyDeploy_Exception_CommandFailedException
 	 * @return
 	 */
-	public function run($command, $withInteraction = FALSE, $returnOutput = FALSE) {
+	public function run($command, $withInteraction = FALSE, $returnOutput = FALSE, $appendOutputToFile = NULL) {
 		if ($withInteraction) {
 			$shellCommand = 'ssh -t -A';
 		}
@@ -78,7 +79,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		if ($this->logCommandsToScreen) {
 			echo ' [' . $shellCommand . ']' . PHP_EOL;
 		}
-		$result = $this->executeCommand($shellCommand, $returnOutput);
+		$result = $this->executeCommand($shellCommand, $returnOutput, $this->getStreamDescriptor($returnOutput, $appendOutputToFile));
 		if ($result['returncode'] != 0) {
 			throw new EasyDeploy_Exception_CommandFailedException('"'.$command.'" failed:'.$result['error']);
 		}
