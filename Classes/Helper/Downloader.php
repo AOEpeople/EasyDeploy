@@ -23,7 +23,7 @@ class EasyDeploy_Helper_Downloader {
 		$baseName = pathinfo($from,PATHINFO_BASENAME);
 		$to = EasyDeploy_Utils::appendDirectorySeperator($to);
 
-		if (is_file($to.$baseName)) {
+		if ($server->isFile($to.$baseName)) {
 			echo 'File "'.$to.$baseName.'" already exists! Skipping transfer!';
 			return $to.$baseName;
 		}
