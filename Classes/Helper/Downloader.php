@@ -41,7 +41,10 @@ class EasyDeploy_Helper_Downloader {
 		// download depending on schema
 		if(strpos($from,'http://') === 0) {
 			$parsedUrlParts=parse_url($from);
-			$server->wgetDownload($parsedUrlParts['scheme'].'://'.$parsedUrlParts['host'].'/'.$parsedUrlParts['path'], $to, @$parsedUrlParts['user'], @$parsedUrlParts['pass']);
+			if (array_key_exists('port', $parsedUrlParts)) {
+				$parsedUrlParts['host'] = $parsedUrlParts['host'] . ':' . $parsedUrlParts['port'];
+			}
+			$server->wgetDownload($parsedUrlParts['scheme'].'://'.$parsedUrlParts['host'].$parsedUrlParts['path'], $to, @$parsedUrlParts['user'], @$parsedUrlParts['pass']);
 		}
 		else if (strpos($from,'ssh://') === 0) {
 			//ssh://user@server:path
