@@ -75,6 +75,7 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer
      */
     public function isFile($dir)
     {
+	clearstatcache();
         return is_file($dir);
     }
 
