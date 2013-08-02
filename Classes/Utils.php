@@ -7,24 +7,15 @@
  */
 class EasyDeploy_Utils
 {
-
-    /**
-     * Color code for yellow font and black background
-     * @var string
+    /**@+
+     * Message types
+     *
+     * @var int
      */
-    const MESSAGE_TYPE_WARNING = "\033[1;33m\033[40m";
-
-    /**
-     * Color code for red
-     * @var string
-     */
-    const MESSAGE_TYPE_ERROR = "\033[0;37m\033[41m\033[1m";
-
-    /**
-     * Color code for red
-     * @var string
-     */
-    const MESSAGE_TYPE_INFO = "\033[1;47m\037";
+    const MESSAGE_TYPE_INFO    = 1;
+    const MESSAGE_TYPE_WARNING = 2;
+    const MESSAGE_TYPE_ERROR   = 3;
+    /**@-*/
 
     /**
      * Helper to include all EasyDeploy Files
@@ -67,6 +58,8 @@ class EasyDeploy_Utils
      */
     static public function includeAll()
     {
+        require_once(dirname(__FILE__) . '/Colors.php');
+
         require_once(dirname(__FILE__) . '/RemoteServer.php');
         require_once(dirname(__FILE__) . '/LocalServer.php');
         require_once(dirname(__FILE__) . '/DeployService.php');
@@ -168,7 +161,7 @@ class EasyDeploy_Utils
      * @param string $dir
      * @return string
      */
-    static public function appendDirectorySeperator($dir)
+    static public function appendDirectorySeparator($dir)
     {
         //prepend with "/"
         if (substr($dir, -1, 1) != '/') {
@@ -223,12 +216,29 @@ class EasyDeploy_Utils
     /**
      * @static
      * @param string $message
-     * @param string $messageType
+     * @param int $messageType
      * @return string
      */
-    static public function formatMessage($message, $messageType = '')
+    static public function formatMessage($message, $messageType = 0)
     {
-        return $messageType . $message . "\033[0m";
+        $foregroundColor = 'white';
+        $backgroundColor = 'black';
+        switch ($messageType) {
+            case self::MESSAGE_TYPE_ERROR:
+                $foregroundColor = 'white';
+                $backgroundColor = 'red';
+                break;
+            case self::MESSAGE_TYPE_WARNING:
+                $foregroundColor = 'yellow';
+                $backgroundColor = 'black';
+                break;
+            case self::MESSAGE_TYPE_INFO:
+                $foregroundColor = 'blue';
+                $backgroundColor = 'black';
+                break;
+        }
+
+        return EasyDeploy_Colors::getColoredString($message, $foregroundColor, $backgroundColor);
     }
 
     /**

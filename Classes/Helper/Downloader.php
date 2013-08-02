@@ -21,7 +21,7 @@ class EasyDeploy_Helper_Downloader {
 	 */
 	public function download(EasyDeploy_AbstractServer $server, $from, $to, $deployerUnixGroup = NULL) {
 		$baseName = pathinfo($from,PATHINFO_BASENAME);
-		$to = EasyDeploy_Utils::appendDirectorySeperator($to);
+		$to = EasyDeploy_Utils::appendDirectorySeparator($to);
 
 		if ($server->isFile($to.$baseName)) {
 			echo 'File "'.$to.$baseName.'" already exists! Skipping transfer!';
