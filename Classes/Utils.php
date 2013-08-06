@@ -247,7 +247,6 @@ class EasyDeploy_Utils
      */
     static public function printWelcomeScreen()
     {
-        while (ob_get_level() > 0) ob_end_flush();
 
         $message = <<<EOT
     _   ___  ___
