@@ -19,6 +19,7 @@ class EasyDeploy_Utils
 
     /**
      * Helper to include all EasyDeploy Files
+     *
      * @param string $message
      * @return string
      */
@@ -34,8 +35,9 @@ class EasyDeploy_Utils
 
     /**
      * Helper to let a user select between different options
-     * @param $message
-     * @param $options
+     *
+     * @param string $message
+     * @param array $options
      */
     static public function userSelectionInput($message, array $options)
     {
@@ -54,7 +56,6 @@ class EasyDeploy_Utils
 
     /**
      * Includes all relevant Classes and initialises date timezone
-     * @return void
      */
     static public function includeAll()
     {
@@ -87,8 +88,9 @@ class EasyDeploy_Utils
     /**
      * Gets a value from command line arguments
      * If not set it returns false
+     *
      * @param string $key
-     * @return string or FALSE
+     * @return string|false
      */
     static public function getParameter($key)
     {
@@ -100,7 +102,7 @@ class EasyDeploy_Utils
     }
 
     /**
-     * Gets a value from command line arguments, If not set it promts for it on commandline
+     * Gets a value from command line arguments, If not set it prompts for it on commandline
      *
      * @param string $key
      * @param string $message
@@ -116,12 +118,10 @@ class EasyDeploy_Utils
     }
 
     /**
-     * Gets a value from command line arguments, If not set it promts for it on commandline
+     * Gets a value from command line arguments, If not set it prompts for it on commandline
      *
      * @param string $key
-     * @param $default
-     *
-     * @internal param string $message
+     * @param string $default
      * @return string
      */
     static public function getParameterOrDefault($key, $default)
@@ -134,7 +134,6 @@ class EasyDeploy_Utils
     }
 
     /**
-     * @static
      * @param string $key
      * @param string $message
      * @param array $options
@@ -148,7 +147,9 @@ class EasyDeploy_Utils
             if (in_array($result, array_keys($options))) {
                 return $result;
             } else {
-                throw new Exception('Given Parameter ' . $key . ' is not an allowed value. Allowed:' .implode(' ', array_keys($options)));
+                throw new Exception('Given Parameter ' . $key . ' is not an allowed value. Allowed:'
+                    . implode(' ', array_keys($options))
+                );
             }
         } else {
             $result = self::userSelectionInput($message, $options);
@@ -172,13 +173,14 @@ class EasyDeploy_Utils
 
     /**
      * Parses command line parameters in the format --key="value"
+     *
      * @return array
      */
     static private function getArvParameters()
     {
         $result = array();
         $params = $GLOBALS ['argv'];
-        // could use getopt() here (since PHP 5.3.0), but it doesn't work relyingly
+        // could use getopt() here (since PHP 5.3.0), but it isn't reliable
         reset($params);
         foreach ($params as $p) {
             $pname = substr($p, 1);
@@ -197,7 +199,6 @@ class EasyDeploy_Utils
     }
 
     /**
-     * @static
      * @param string $label
      * @return string
      */
@@ -214,7 +215,6 @@ class EasyDeploy_Utils
     }
 
     /**
-     * @static
      * @param string $message
      * @param int $messageType
      * @return string
@@ -242,8 +242,7 @@ class EasyDeploy_Utils
     }
 
     /**
-     * @static
-     * @return void
+     * Print welcome screen
      */
     static public function printWelcomeScreen()
     {
