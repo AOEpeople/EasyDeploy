@@ -22,174 +22,173 @@ require_once(dirname(__FILE__) . '/AbstractServer.php');
  *
  * @author Daniel Pötzinger
  */
-class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer
-{
-    /**
-     * @var string
-     */
-    private $host;
+class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 
-    /**
-     * @var string
-     */
-    private $userName;
+	/**
+	 * @var string
+	 */
+	private $host;
 
-    /**
-     * @var string
-     */
-    private $privateKey;
+	/**
+	 * @var string
+	 */
+	private $userName;
 
-    /**
-     * @param string $host
-     * @param string $userName
-     * @param string $privateKey
-     * @return EasyDeploy_RemoteServer
-     */
-    public function __construct($host, $userName = null, $privateKey = null)
-    {
-        $this->host       = $host;
-        $this->userName   = $userName;
-        $this->privateKey = $privateKey;
-    }
+	/**
+	 * @var string
+	 */
+	private $privateKey;
 
-    /**
-     * Runs the given command remotely
-     *
-     * @param string $command
-     * @param boolean $withInteraction   set to true if the command should stay open and wait for STDIN
-     * @param boolean $returnOutput        set to true if you need the result - otherwise its directed to STDOUT
-     * @param string $appendOutputToFile    set to a valid existing file (on current OS context) to write the output directly to a file
-     * @throws EasyDeploy_Exception_CommandFailedException
-     * @return
-     */
-    public function run($command, $withInteraction = false, $returnOutput = false, $appendOutputToFile = null)
-    {
-        if ($withInteraction) {
-            $shellCommand = 'ssh -t -A';
-        } else {
-            $shellCommand = 'ssh -A';
-        }
-        if (!is_null($this->privateKey)) {
-            $shellCommand .= ' -i ' . $this->privateKey;
-        }
-        $shellCommand .= ' ' . ((!is_null($this->userName)) ? $this->userName . '@' : '') . $this->host . ' ' . escapeshellarg($command);
+	/**
+	 * @param string $host
+	 * @param string $userName
+	 * @param string $privateKey
+	 * @return EasyDeploy_RemoteServer
+	 */
+	public function __construct($host, $userName = null, $privateKey = null) {
+		$this->host       = $host;
+		$this->userName   = $userName;
+		$this->privateKey = $privateKey;
+	}
 
-        $result = $this->executeCommand($shellCommand, $returnOutput, $this->getStreamDescriptor($returnOutput, $appendOutputToFile));
-        if ($result['returncode'] != 0) {
-            throw new EasyDeploy_Exception_CommandFailedException('"' . $command . '" failed:' . $result['error']);
-        }
-        if ($returnOutput) {
-            return $result['out'];
-        }
-    }
+	/**
+	 * Runs the given command remotely
+	 *
+	 * @param string $command
+	 * @param boolean $withInteraction set to true if the command should stay open and wait for STDIN
+	 * @param boolean $returnOutput set to true if you need the result - otherwise its directed to STDOUT
+	 * @param string $appendOutputToFile set to a valid existing file (on current OS context) to write the output directly to a file
+	 * @throws EasyDeploy_Exception_CommandFailedException
+	 * @return string|null
+	 */
+	public function run($command, $withInteraction = false, $returnOutput = false, $appendOutputToFile = null) {
+		if ($withInteraction) {
+			$shellCommand = 'ssh -t -A';
+		} else {
+			$shellCommand = 'ssh -A';
+		}
+		if (!is_null($this->privateKey)) {
+			$shellCommand .= ' -i ' . $this->privateKey;
+		}
+		$shellCommand .= ' ' . ((!is_null($this->userName)) ? $this->userName . '@' : '') . $this->host . ' ' . escapeshellarg($command);
 
-    /**
-     * Copy a local file to the server
-     *
-     * @param string $from
-     * @param string $to
-     * @throws EasyDeploy_Exception_CommandFailedException
-     * @throws Exception
-     */
-    public function copyLocalFile($from, $to)
-    {
-        if (!is_file($from)) {
-            throw new Exception($from . ' is not a file');
-        }
+		$result = $this->executeCommand($shellCommand, $returnOutput, $this->getStreamDescriptor($returnOutput, $appendOutputToFile));
+		if ($result['returncode'] != 0) {
+			throw new EasyDeploy_Exception_CommandFailedException('"' . $command . '" failed:' . $result['error']);
+		}
+		if ($returnOutput) {
+			return $result['out'];
+		}
 
-        $command = 'rsync -avz ' . escapeshellarg($from) . ' ' . $this->host . ':' . escapeshellarg($to);
-        $result = $this->executeCommand($command, true);
+		return null;
+	}
 
-        if ($result['returncode'] != 0) {
-            throw new EasyDeploy_Exception_CommandFailedException($command . ' ' . $result['error']);
-        }
-    }
+	/**
+	 * Copy a local file to the server
+	 *
+	 * @param string $from
+	 * @param string $to
+	 * @throws EasyDeploy_Exception_CommandFailedException
+	 * @throws Exception
+	 */
+	public function copyLocalFile($from, $to) {
+		if (!is_file($from)) {
+			throw new Exception($from . ' is not a file');
+		}
 
-    /**
-     * Copy a local dir to the server
-     *
-     * @param string $from
-     * @param string $to
-     * @throws EasyDeploy_Exception_CommandFailedException
-     */
-    public function copyLocalDir($from, $to)
-    {
-        $command = 'rsync --delete -avz ' . escapeshellarg($from) . ' ' . $this->host . ':' . escapeshellarg($to);
-        $result = $this->executeCommand($command, true);
+		$command = 'rsync -avz ' . escapeshellarg($from) . ' ' . $this->host . ':' . escapeshellarg($to);
+		$result  = $this->executeCommand($command, true);
 
-        if ($result['returncode'] != 0) {
-            throw new EasyDeploy_Exception_CommandFailedException($command . ' ' . $result['error']);
-        }
-    }
+		if ($result['returncode'] != 0) {
+			throw new EasyDeploy_Exception_CommandFailedException($command . ' ' . $result['error']);
+		}
+	}
 
-    /**
-     * @param string $dir
-     * @throws EasyDeploy_Exception_CommandFailedException
-     * @return boolean
-     */
-    public function isDir($dir)
-    {
-        try {
-            $output = $this->run('ls -al ' . $dir, false, true);
-        } catch (EasyDeploy_Exception_CommandFailedException $e) {
-            if (strpos($e->getMessage(), 'No such file or directory') !== false) {
-                return false;
-            } else {
-                throw $e;
-            }
-        }
+	/**
+	 * Copy a local dir to the server
+	 *
+	 * @param string $from
+	 * @param string $to
+	 * @throws EasyDeploy_Exception_CommandFailedException
+	 */
+	public function copyLocalDir($from, $to) {
+		$command = 'rsync --delete -avz ' . escapeshellarg($from) . ' ' . $this->host . ':' . escapeshellarg($to);
+		$result  = $this->executeCommand($command, true);
 
-        if (strpos($output, $dir) !== false) {
-            //is a file
-            return false;
-        }
+		if ($result['returncode'] != 0) {
+			throw new EasyDeploy_Exception_CommandFailedException($command . ' ' . $result['error']);
+		}
+	}
 
-        return true;
-    }
+	/**
+	 * @param string $dir
+	 * @throws EasyDeploy_Exception_CommandFailedException
+	 * @return boolean
+	 */
+	public function isDir($dir) {
+		try {
+			$output = $this->run('ls -al ' . $dir, false, true);
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+			if (strpos($e->getMessage(), 'No such file or directory') !== false) {
+				return false;
+			} else {
+				throw $e;
+			}
+		}
 
-    /**
-     * @param string $dir
-     * @return boolean
-     */
-    public function isFile($dir)
-    {
-        try {
-            $output = $this->run('ls -al ' . $dir, false, true);
-            if (strpos($output, 'No such file or directory') !== false) {
-                return false;
-            }
-            if (strpos($output, $dir) !== false) {
-                return true;
-            }
-        } catch (EasyDeploy_Exception_CommandFailedException $e) {}
+		if (strpos($output, $dir) !== false) {
+			//is a file
+			return false;
+		}
 
-        return false;
-    }
+		return true;
+	}
 
-    /**
-     * SSH user name.
-     *
-     * @param string $userName
-     * @return void
-     */
-    public function setUserName($userName)
-    {
-        $this->userName = $userName;
-    }
+	/**
+	 * @param string $dir
+	 * @return bool
+	 */
+	public function isFile($dir) {
+		try {
+			$output = $this->run('ls -al ' . $dir, false, true);
+			if (strpos($output, 'No such file or directory') !== false) {
+				return false;
+			}
+			if (strpos($output, $dir) !== false) {
+				return true;
+			}
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+		}
 
-    /**
-     * @param string $directory
-     * @return boolean
-     */
-    public function isLink($directory)
-    {
-        try {
-            $result = $this->run('if [ -L "' . $directory . '" ] ; then echo 1; else echo 0; fi', false, true);
-            if (trim($result) == 1) {
-                return true;
-            }
-        } catch (EasyDeploy_Exception_CommandFailedException $e) {}
+		return false;
+	}
 
-        return false;
-    }
+	/**
+	 * SSH user name
+	 *
+	 * @param string $userName
+	 * @return $this
+	 */
+	public function setUserName($userName) {
+		$this->userName = $userName;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $directory
+	 * @return bool
+	 */
+	public function isLink($directory) {
+		try {
+			$result = $this->run('if [ -L "' . $directory . '" ] ; then echo 1; else echo 0; fi', false, true);
+			if (trim($result) == 1) {
+				return true;
+			}
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+		}
+
+		return false;
+	}
+
 }
