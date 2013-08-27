@@ -121,40 +121,64 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	}
 
 	/**
-	 * @param string $dir
-	 * @throws EasyDeploy_Exception_CommandFailedException
-	 * @return boolean
+	 * Verify whether given $target exists
+	 *
+	 * @param string $target
+	 * @return bool
 	 */
-	public function isDir($dir) {
+	public function targetExists($target) {
 		try {
-			$output = $this->run('ls -al ' . $dir, false, true);
-		} catch (EasyDeploy_Exception_CommandFailedException $e) {
-			if (strpos($e->getMessage(), 'No such file or directory') !== false) {
-				return false;
-			} else {
-				throw $e;
+			$result = $this->run('if [ -e "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
+			if (trim($result) == 1) {
+				return true;
 			}
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
 		}
 
-		if (strpos($output, $dir) !== false) {
-			//is a file
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	/**
-	 * @param string $dir
+	 * @param string $target
+	 * @throws EasyDeploy_Exception_CommandFailedException
+	 * @return boolean
+	 */
+	public function isDir($target) {
+		try {
+			$result = $this->run('if [ -d "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
+			if (trim($result) == 1) {
+				return true;
+			}
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param string $target
 	 * @return bool
 	 */
-	public function isFile($dir) {
+	public function isLink($target) {
 		try {
-			$output = $this->run('ls -al ' . $dir, false, true);
-			if (strpos($output, 'No such file or directory') !== false) {
-				return false;
+			$result = $this->run('if [ -L "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
+			if (trim($result) == 1) {
+				return true;
 			}
-			if (strpos($output, $dir) !== false) {
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param string $target
+	 * @return bool
+	 */
+	public function isFile($target) {
+		try {
+			$result = $this->run('if [ -f "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
+			if (trim($result) == 1) {
 				return true;
 			}
 		} catch (EasyDeploy_Exception_CommandFailedException $e) {
@@ -173,22 +197,6 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 		$this->userName = $userName;
 
 		return $this;
-	}
-
-	/**
-	 * @param string $directory
-	 * @return bool
-	 */
-	public function isLink($directory) {
-		try {
-			$result = $this->run('if [ -L "' . $directory . '" ] ; then echo 1; else echo 0; fi', false, true);
-			if (trim($result) == 1) {
-				return true;
-			}
-		} catch (EasyDeploy_Exception_CommandFailedException $e) {
-		}
-
-		return false;
 	}
 
 }

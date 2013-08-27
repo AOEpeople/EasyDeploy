@@ -59,29 +59,45 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 	}
 
 	/**
-	 * @param string $path
+	 * Verify whether given $target exists
+	 *
+	 * @param string $target
 	 * @return bool
 	 */
-	public function isLink($path) {
-		return is_link(rtrim($path, '/'));
+	public function targetExists($target) {
+		return file_exists($target);
 	}
 
 	/**
-	 * @param string $dir
-	 * @return boolean
+	 * Verify whether $target is directory
+	 *
+	 * @param string $target
+	 * @return bool
 	 */
-	public function isDir($dir) {
-		return is_dir($dir);
+	public function isDir($target) {
+		return is_dir($target);
 	}
 
 	/**
-	 * @param string $dir
-	 * @return boolean
+	 * Verify whether $target is link
+	 *
+	 * @param string $target
+	 * @return bool
 	 */
-	public function isFile($dir) {
+	public function isLink($target) {
+		return is_link(rtrim($target, '/'));
+	}
+
+	/**
+	 * Verify whether $target is file
+	 *
+	 * @param string $target
+	 * @return bool
+	 */
+	public function isFile($target) {
 		clearstatcache();
 
-		return is_file($dir);
+		return is_file($target);
 	}
 
 }

@@ -29,13 +29,13 @@ abstract class EasyDeploy_AbstractServer {
 	 * Runs the given command remotely
 	 * @throws EasyDeploy_Exception_CommandFailedException
 	 * @param string $command
-	 * @param boolean $withInteraction set to true if the command should stay open and wait for STDIN
-	 * @param boolean $returnOutput set to true if you need the result - otherwise its directed to STDOUT
+	 * @param bool $withInteraction set to true if the command should stay open and wait for STDIN
+	 * @param bool $returnOutput set to true if you need the result - otherwise its directed to STDOUT
 	 */
 	abstract public function run($command, $withInteraction = false, $returnOutput = false);
 
 	/**
-	 * copies a local file to the server
+	 * Copy local file to the server
 	 *
 	 * @param string $from
 	 * @param string $to
@@ -43,7 +43,7 @@ abstract class EasyDeploy_AbstractServer {
 	abstract public function copyLocalFile($from, $to);
 
 	/**
-	 * copies a local file to the server
+	 * Copy local directory to the server
 	 *
 	 * @param string $from
 	 * @param string $to
@@ -51,23 +51,36 @@ abstract class EasyDeploy_AbstractServer {
 	abstract public function copyLocalDir($from, $to);
 
 	/**
-	 * @param string $dir
-	 * @return boolean
+	 * Verify whether given $target exists
+	 *
+	 * @param $target
+	 * @return bool
 	 */
-	abstract public function isDir($dir);
+	abstract public function targetExists($target);
 
 	/**
-	 * @abstract
-	 * @param string $directory
-	 * @return boolean
+	 * Verify whether $target is directory
+	 *
+	 * @param string $target
+	 * @return bool
 	 */
-	abstract public function isLink($directory);
+	abstract public function isDir($target);
 
 	/**
-	 * @param string $dir
-	 * @return boolean
+	 * Verify whether $target is link
+	 *
+	 * @param string $target
+	 * @return bool
 	 */
-	abstract public function isFile($dir);
+	abstract public function isLink($target);
+
+	/**
+	 * Verify whether $target is file
+	 *
+	 * @param string $target
+	 * @return bool
+	 */
+	abstract public function isFile($target);
 
 	/**
 	 * @param string $command
@@ -143,7 +156,7 @@ abstract class EasyDeploy_AbstractServer {
 	}
 
 	/**
-	 * Downloads a file from http with wget
+	 * Download file from http with wget
 	 *
 	 * @param string $from the url that should be downloaded
 	 * @param string $to download target
@@ -167,14 +180,14 @@ abstract class EasyDeploy_AbstractServer {
 	}
 
 	/**
-	 * @param boolean $logCommandsToScreen
+	 * @param bool $logCommandsToScreen
 	 */
 	public function setLogCommandsToScreen($logCommandsToScreen) {
 		$this->logCommandsToScreen = $logCommandsToScreen;
 	}
 
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function getLogCommandsToScreen() {
 		return $this->logCommandsToScreen;
