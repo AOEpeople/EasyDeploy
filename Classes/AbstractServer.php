@@ -56,7 +56,7 @@ abstract class EasyDeploy_AbstractServer {
 	 * @param $target
 	 * @return bool
 	 */
-	abstract public function targetExists($target);
+	abstract public function exists($target);
 
 	/**
 	 * Verify whether $target is directory
@@ -81,6 +81,13 @@ abstract class EasyDeploy_AbstractServer {
 	 * @return bool
 	 */
 	abstract public function isFile($target);
+
+	/**
+	 * Get current working directory
+	 *
+	 * @return string
+	 */
+	abstract public function getCwd();
 
 	/**
 	 * @param string $command

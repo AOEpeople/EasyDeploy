@@ -64,7 +64,7 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 	 * @param string $target
 	 * @return bool
 	 */
-	public function targetExists($target) {
+	public function exists($target) {
 		return file_exists($target);
 	}
 
@@ -98,6 +98,15 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 		clearstatcache();
 
 		return is_file($target);
+	}
+
+	/**
+	 * Get current working directory
+	 *
+	 * @return string
+	 */
+	public function getCwd() {
+		return getcwd();
 	}
 
 }

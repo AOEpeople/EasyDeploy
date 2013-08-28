@@ -121,70 +121,76 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	}
 
 	/**
+	 * Verify $target using $condition using bash if statement
+	 *
+	 * @param string $target
+	 * @param string $condition
+	 * @return bool
+	 */
+	protected function _bashIf($target, $condition) {
+		try {
+			$command = 'if [ '. $condition . ' "' . $target . '" ] ; then echo 1; else echo 0; fi';
+			if (trim($this->run($command, false, true)) == 1) {
+				return true;
+			}
+		} catch (EasyDeploy_Exception_CommandFailedException $e) {
+		}
+
+		return false;
+	}
+
+	/**
 	 * Verify whether given $target exists
 	 *
 	 * @param string $target
 	 * @return bool
 	 */
-	public function targetExists($target) {
-		try {
-			$result = $this->run('if [ -e "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
-			if (trim($result) == 1) {
-				return true;
-			}
-		} catch (EasyDeploy_Exception_CommandFailedException $e) {
-		}
-
-		return false;
+	public function exists($target) {
+		return $this->_bashIf($target, '-e');
 	}
 
 	/**
+	 * Verify whether $target is directory
+	 *
 	 * @param string $target
-	 * @throws EasyDeploy_Exception_CommandFailedException
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isDir($target) {
-		try {
-			$result = $this->run('if [ -d "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
-			if (trim($result) == 1) {
-				return true;
-			}
-		} catch (EasyDeploy_Exception_CommandFailedException $e) {
-		}
-
-		return false;
+		return $this->_bashIf($target, '-d');
 	}
 
 	/**
+	 * Verify whether $target is link
+	 *
 	 * @param string $target
 	 * @return bool
 	 */
 	public function isLink($target) {
-		try {
-			$result = $this->run('if [ -L "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
-			if (trim($result) == 1) {
-				return true;
-			}
-		} catch (EasyDeploy_Exception_CommandFailedException $e) {
-		}
-
-		return false;
+		return $this->_bashIf($target, '-L');
 	}
 
 	/**
+	 * Verify whether $target is file
+	 *
 	 * @param string $target
 	 * @return bool
 	 */
 	public function isFile($target) {
+		return $this->_bashIf($target, '-f');
+	}
+
+	/**
+	 * Get current working directory
+	 *
+	 * @return string
+	 */
+	public function getCwd() {
 		try {
-			$result = $this->run('if [ -f "' . $target . '" ] ; then echo 1; else echo 0; fi', false, true);
-			if (trim($result) == 1) {
-				return true;
-			}
+			return $this->run('pwd', false, true);
 		} catch (EasyDeploy_Exception_CommandFailedException $e) {
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
