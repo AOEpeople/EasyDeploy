@@ -112,7 +112,7 @@ class EasyDeploy_RemoteServer extends EasyDeploy_AbstractServer {
 	 * @throws EasyDeploy_Exception_CommandFailedException
 	 */
 	public function copyLocalDir($from, $to) {
-		$command = 'rsync --delete -avz ' . escapeshellarg($from) . ' ' . $this->host . ':' . escapeshellarg($to);
+		$command = 'rsync --delete -avz ' . rtrim(escapeshellarg($from), DIRECTORY_SEPARATOR) . '/*' . ' ' . $this->host . ':' . escapeshellarg($to);
 		$result  = $this->executeCommand($command, true);
 
 		if ($result['returncode'] != 0) {
