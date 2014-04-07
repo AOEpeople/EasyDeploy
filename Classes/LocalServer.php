@@ -55,7 +55,7 @@ class EasyDeploy_LocalServer extends EasyDeploy_AbstractServer {
 	 * @param string $to
 	 */
 	public function copyLocalDir($from, $to) {
-		$this->executeCommand('cp -r ' . rtrim(escapeshellarg($from), DIRECTORY_SEPARATOR) . '/*' . ' ' . escapeshellarg($to));
+		$this->executeCommand('cp -r ' . escapeshellarg($from) . ' ' . escapeshellarg($to));
 	}
 
 	/**
