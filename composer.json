@@ -2,6 +2,7 @@
     "name": "aoepeople/easy-deploy",
     "description": "Set of PHP Scripts that makes it easy to deploy to local or remote Servers",
     "license": "GPL v3",
+	"minimum-stability":"dev",
     "authors": [
         {
             "name": "Daniel Pötzinger"
