@@ -8,6 +8,9 @@
             "name": "Daniel Pötzinger"
         }
     ],
+	"autoload": {
+		"classmap": ["Classes/"]
+	},
     "require": {
 
     }
